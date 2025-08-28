@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -28,6 +29,15 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
         $user = $request->user();
+
+        // Create a JWT token for this authenticated user and store in session
+        try {
+            $token = JWTAuth::fromUser($user);
+            $request->session()->put('jwt_token', $token);
+        } catch (\Throwable $e) {
+            // If token creation fails, continue with session auth
+        }
+
         if ($user->isAdmin()) {
             return redirect()->intended(route('admin.complaints.index', absolute: false));
         }
@@ -42,10 +52,21 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        // Invalidate JWT if present
+        if ($request->session()->has('jwt_token')) {
+            try {
+                $token = $request->session()->get('jwt_token');
+                JWTAuth::setToken($token);
+                JWTAuth::invalidate();
+            } catch (\Throwable $e) {
+                // ignore and continue logout
+            }
+        }
+
         Auth::guard('web')->logout();
 
+        $request->session()->forget('jwt_token');
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
         return redirect('/');

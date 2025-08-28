@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ComplaintController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\ComplaintAdminController;
 use App\Http\Controllers\Staff\StaffComplaintController;
 use Illuminate\Support\Facades\Route;
@@ -10,12 +11,20 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Temporary logout route for testing
+Route::get('/logout-get', function () {
+    Auth::logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect('/')->with('success', 'Logged out successfully!');
+})->name('logout.get');
+
 // Landing page remains public
 
 Route::middleware(['auth'])->group(function () {
     // User area
     Route::middleware('role:user')->group(function () {
-        Route::get('/dashboard', [ComplaintController::class,'index'])->name('dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::resource('complaints', ComplaintController::class)->only(['index','create','store','show']);
     });
 

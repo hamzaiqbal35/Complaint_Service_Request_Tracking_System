@@ -12,9 +12,24 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
+                    @auth
+                        @if(auth()->user()->isUser())
+                            <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                                {{ __('Dashboard') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('complaints.index')" :active="request()->routeIs('complaints.*')">
+                                {{ __('My Complaints') }}
+                            </x-nav-link>
+                        @elseif(auth()->user()->isStaff())
+                            <x-nav-link :href="route('staff.complaints.index')" :active="request()->routeIs('staff.*')">
+                                {{ __('Assigned Complaints') }}
+                            </x-nav-link>
+                        @elseif(auth()->user()->isAdmin())
+                            <x-nav-link :href="route('admin.complaints.index')" :active="request()->routeIs('admin.*')">
+                                {{ __('All Complaints') }}
+                            </x-nav-link>
+                        @endif
+                    @endauth
                 </div>
             </div>
 
@@ -23,7 +38,10 @@
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->name }}</div>
+                            <div class="d-flex align-items-center">
+                                <span class="me-2">{{ Auth::user()->name }}</span>
+                                <span class="badge bg-primary">{{ ucfirst(Auth::user()->role) }}</span>
+                            </div>
 
                             <div class="ms-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -38,13 +56,27 @@
                             {{ __('Profile') }}
                         </x-dropdown-link>
 
-                        <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
+                        <!-- Role-specific links -->
+                        @if(auth()->user()->isUser())
+                            <x-dropdown-link :href="route('complaints.create')">
+                                {{ __('New Complaint') }}
+                            </x-dropdown-link>
+                        @elseif(auth()->user()->isStaff())
+                            <x-dropdown-link :href="route('staff.complaints.index')">
+                                {{ __('My Assignments') }}
+                            </x-dropdown-link>
+                        @elseif(auth()->user()->isAdmin())
+                            <x-dropdown-link :href="route('admin.complaints.index')">
+                                {{ __('Manage Complaints') }}
+                            </x-dropdown-link>
+                        @endif
 
+                        <!-- Authentication -->
+                        <form method="POST" action="{{ route('logout') }}" id="logoutForm">
+                            @csrf
                             <x-dropdown-link :href="route('logout')"
                                     onclick="event.preventDefault();
-                                                this.closest('form').submit();">
+                                                document.getElementById('logoutForm').submit(); localStorage.removeItem('jwt_token');">
                                 {{ __('Log Out') }}
                             </x-dropdown-link>
                         </form>
@@ -67,9 +99,24 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
+            @auth
+                @if(auth()->user()->isUser())
+                    <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                        {{ __('Dashboard') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('complaints.index')" :active="request()->routeIs('complaints.*')">
+                        {{ __('My Complaints') }}
+                    </x-responsive-nav-link>
+                @elseif(auth()->user()->isStaff())
+                    <x-responsive-nav-link :href="route('staff.complaints.index')" :active="request()->routeIs('staff.*')">
+                        {{ __('Assigned Complaints') }}
+                    </x-responsive-nav-link>
+                @elseif(auth()->user()->isAdmin())
+                    <x-responsive-nav-link :href="route('admin.complaints.index')" :active="request()->routeIs('admin.*')">
+                        {{ __('All Complaints') }}
+                    </x-responsive-nav-link>
+                @endif
+            @endauth
         </div>
 
         <!-- Responsive Settings Options -->
@@ -77,6 +124,9 @@
             <div class="px-4">
                 <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
                 <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+                <div class="mt-1">
+                    <span class="badge bg-primary">{{ ucfirst(Auth::user()->role) }}</span>
+                </div>
             </div>
 
             <div class="mt-3 space-y-1">
@@ -84,13 +134,27 @@
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
 
-                <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
+                <!-- Role-specific mobile links -->
+                @if(auth()->user()->isUser())
+                    <x-responsive-nav-link :href="route('complaints.create')">
+                        {{ __('New Complaint') }}
+                    </x-responsive-nav-link>
+                @elseif(auth()->user()->isStaff())
+                    <x-responsive-nav-link :href="route('staff.complaints.index')">
+                        {{ __('My Assignments') }}
+                    </x-responsive-nav-link>
+                @elseif(auth()->user()->isAdmin())
+                    <x-responsive-nav-link :href="route('admin.complaints.index')">
+                        {{ __('Manage Complaints') }}
+                    </x-responsive-nav-link>
+                @endif
 
+                <!-- Authentication -->
+                <form method="POST" action="{{ route('logout') }}" id="logoutFormMobile">
+                    @csrf
                     <x-responsive-nav-link :href="route('logout')"
                             onclick="event.preventDefault();
-                                        this.closest('form').submit();">
+                                        document.getElementById('logoutFormMobile').submit(); localStorage.removeItem('jwt_token');">
                         {{ __('Log Out') }}
                     </x-responsive-nav-link>
                 </form>

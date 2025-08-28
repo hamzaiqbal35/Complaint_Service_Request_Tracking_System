@@ -5,230 +5,606 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Complaint & Service Request Tracking System</title>
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         <style>
-            .gradient-bg {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            :root {
+                --primary-color: #0d9488;
+                --primary-dark: #0f766e;
+                --primary-light: #14b8a6;
+                --secondary-color: #059669;
+                --secondary-dark: #047857;
+                --secondary-light: #10b981;
+                --accent-color: #f59e0b;
+                --accent-dark: #d97706;
+                --accent-light: #fbbf24;
+                --success-color: #10b981;
+                --warning-color: #f59e0b;
+                --danger-color: #ef4444;
+                --dark-color: #1f2937;
+                --light-color: #f8fafc;
+                --gray-color: #6b7280;
+                --white-color: #ffffff;
+                
+                --primary-gradient: linear-gradient(135deg, #0d9488 0%, #059669 100%);
+                --secondary-gradient: linear-gradient(135deg, #14b8a6 0%, #10b981 100%);
+                --accent-gradient: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+                --dark-gradient: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+                --hero-gradient: linear-gradient(135deg, #0d9488 0%, #059669 50%, #047857 100%);
             }
-            .hero-gradient {
-                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+
+            body {
+                font-family: 'Figtree', sans-serif;
+                overflow-x: hidden;
+                background-color: var(--light-color);
             }
-            .floating {
-                animation: floating 3s ease-in-out infinite;
+
+            .gradient-text {
+                background: var(--primary-gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
             }
-            @keyframes floating {
-                0%, 100% { transform: translateY(0px); }
-                50% { transform: translateY(-20px); }
+
+            .hero-section {
+                background: var(--hero-gradient);
+                position: relative;
+                overflow: hidden;
+                min-height: 100vh;
             }
-            .fade-in {
-                animation: fadeIn 1s ease-in;
+
+            .hero-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="rgba(255,255,255,0.05)" points="0,1000 1000,0 1000,1000"/></svg>');
+                background-size: cover;
             }
-            @keyframes fadeIn {
-                from { opacity: 0; transform: translateY(30px); }
-                to { opacity: 1; transform: translateY(0); }
+
+            .floating-element {
+                animation: float 6s ease-in-out infinite;
             }
-            .slide-in {
-                animation: slideIn 0.8s ease-out;
+
+            .floating-element:nth-child(2) {
+                animation-delay: 2s;
             }
-            @keyframes slideIn {
-                from { transform: translateX(-100px); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
+
+            .floating-element:nth-child(3) {
+                animation-delay: 4s;
             }
+
+            @keyframes float {
+                0%, 100% { transform: translateY(0px) rotate(0deg); }
+                33% { transform: translateY(-20px) rotate(5deg); }
+                66% { transform: translateY(-10px) rotate(-5deg); }
+            }
+
+            .fade-in-up {
+                animation: fadeInUp 1s ease-out;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(50px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .slide-in-left {
+                animation: slideInLeft 1s ease-out;
+            }
+
+            @keyframes slideInLeft {
+                from {
+                    opacity: 0;
+                    transform: translateX(-100px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            .slide-in-right {
+                animation: slideInRight 1s ease-out;
+            }
+
+            @keyframes slideInRight {
+                from {
+                    opacity: 0;
+                    transform: translateX(100px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
             .pulse-glow {
                 animation: pulseGlow 2s ease-in-out infinite alternate;
             }
+
             @keyframes pulseGlow {
-                from { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
-                to { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); }
+                from { 
+                    box-shadow: 0 0 20px rgba(13, 148, 136, 0.4);
+                    transform: scale(1);
+                }
+                to { 
+                    box-shadow: 0 0 30px rgba(13, 148, 136, 0.8);
+                    transform: scale(1.05);
+                }
             }
+
             .feature-card {
-                transition: all 0.3s ease;
-            }
-            .feature-card:hover {
-                transform: translateY(-10px);
-                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            }
-            .glass-effect {
-                background: rgba(255, 255, 255, 0.1);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                background: rgba(255, 255, 255, 0.95);
                 backdrop-filter: blur(10px);
                 border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 16px;
+            }
+
+            .feature-card:hover {
+                transform: translateY(-15px) scale(1.02);
+                box-shadow: 0 25px 50px rgba(13, 148, 136, 0.15);
+                background: rgba(255, 255, 255, 1);
+                border-color: var(--primary-color);
+            }
+
+            .glass-effect {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(15px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            }
+
+            .btn-modern {
+                position: relative;
+                overflow: hidden;
+                transition: all 0.3s ease;
+                border: none;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+                border-radius: 12px;
+            }
+
+            .btn-modern::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+                transition: left 0.5s;
+            }
+
+            .btn-modern:hover::before {
+                left: 100%;
+            }
+
+            .btn-modern:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(13, 148, 136, 0.2);
+            }
+
+            .btn-primary {
+                background: var(--primary-gradient);
+                border: none;
+            }
+
+            .btn-primary:hover {
+                background: var(--primary-dark);
+                transform: translateY(-2px);
+            }
+
+            .btn-outline-primary {
+                border-color: var(--primary-color);
+                color: var(--primary-color);
+            }
+
+            .btn-outline-primary:hover {
+                background: var(--primary-color);
+                border-color: var(--primary-color);
+            }
+
+            .stats-card {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(15px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                transition: all 0.3s ease;
+                border-radius: 16px;
+            }
+
+            .stats-card:hover {
+                transform: translateY(-5px);
+                background: rgba(255, 255, 255, 0.15);
+            }
+
+            .navbar-modern {
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(20px);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+                transition: all 0.3s ease;
+            }
+
+            .navbar-modern.scrolled {
+                background: rgba(255, 255, 255, 0.98);
+                box-shadow: 0 4px 20px rgba(13, 148, 136, 0.1);
+            }
+
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+
+            .gradient-border {
+                position: relative;
+                background: white;
+                border-radius: 20px;
+            }
+
+            .gradient-border::before {
+                content: '';
+                position: absolute;
+                top: -2px;
+                left: -2px;
+                right: -2px;
+                bottom: -2px;
+                background: var(--primary-gradient);
+                border-radius: 22px;
+                z-index: -1;
+            }
+
+            .wave-animation {
+                animation: wave 3s ease-in-out infinite;
+            }
+
+            @keyframes wave {
+                0%, 100% { transform: rotate(0deg); }
+                25% { transform: rotate(5deg); }
+                75% { transform: rotate(-5deg); }
+            }
+
+            .section-divider {
+                height: 100px;
+                background: var(--primary-gradient);
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 70%);
+            }
+
+            .section-divider-reverse {
+                height: 100px;
+                background: var(--primary-gradient);
+                clip-path: polygon(0 30%, 100% 0, 100% 100%, 0 100%);
+            }
+
+            .hero-title {
+                font-size: 3.5rem;
+                line-height: 1.2;
+            }
+
+            .hero-title .highlight {
+                color: var(--accent-color);
+                text-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+            }
+
+            .feature-icon {
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 1.5rem;
+                font-size: 2rem;
+                color: white;
+            }
+
+            .feature-icon.primary {
+                background: var(--primary-gradient);
+            }
+
+            .feature-icon.secondary {
+                background: var(--secondary-gradient);
+            }
+
+            .feature-icon.accent {
+                background: var(--accent-gradient);
+            }
+
+            .feature-icon.success {
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            }
+
+            .bg-custom-light {
+                background-color: #f8fafc;
+            }
+
+            .bg-custom-dark {
+                background-color: var(--dark-color);
+            }
+
+            .text-custom-primary {
+                color: var(--primary-color);
+            }
+
+            .text-custom-secondary {
+                color: var(--secondary-color);
+            }
+
+            @media (max-width: 768px) {
+                .hero-title {
+                    font-size: 2.5rem !important;
+                }
+                
+                .floating-element {
+                    display: none;
+                }
             }
         </style>
     </head>
     <body class="antialiased">
         <!-- Navigation -->
-        <nav class="bg-white/90 backdrop-blur-md shadow-lg fixed w-full z-50">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <h1 class="text-2xl font-bold gradient-bg bg-clip-text text-transparent">
-                                <i class="fas fa-shield-alt mr-2"></i>CSRTS
-                            </h1>
-                        </div>
+        <nav class="navbar navbar-expand-lg navbar-modern fixed-top" id="mainNavbar">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center" href="#">
+                    <div class="bg-primary rounded-lg p-2 me-2">
+                        <i class="fas fa-shield-alt text-white"></i>
                     </div>
-                    <div class="flex items-center space-x-4">
+                    <span class="gradient-text fw-bold fs-4">Complaint Service Request Tracking System</span>
+                </a>
+
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
                         @auth
-                            <a href="{{ url('/dashboard') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                                <i class="fas fa-tachometer-alt mr-1"></i>Dashboard
-                            </a>
-                        @else
-                            <a href="{{ route('login') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                                <i class="fas fa-sign-in-alt mr-1"></i>Log in
-                            </a>
-                            @if (Route::has('register'))
-                                <a href="{{ route('register') }}" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 pulse-glow">
-                                    <i class="fas fa-user-plus mr-1"></i>Register
+                            <li class="nav-item">
+                                <a class="nav-link fw-medium" href="{{ url('/dashboard') }}">
+                                    <i class="fas fa-tachometer-alt me-1"></i>Dashboard
                                 </a>
+                            </li>
+                        @else
+                            <li class="nav-item">
+                                <a class="nav-link fw-medium" href="{{ route('login') }}">
+                                    <i class="fas fa-sign-in-alt me-1"></i>Log in
+                                </a>
+                            </li>
+                            @if (Route::has('register'))
+                                <li class="nav-item">
+                                    <a class="btn btn-primary btn-modern ms-2" href="{{ route('register') }}">
+                                        <i class="fas fa-user-plus me-1"></i>Register
+                                    </a>
+                                </li>
                             @endif
                         @endauth
-                    </div>
+                    </ul>
                 </div>
             </div>
         </nav>
 
         <!-- Hero Section -->
-        <div class="relative overflow-hidden hero-gradient min-h-screen">
-            <div class="absolute inset-0 bg-black opacity-20"></div>
-            <div class="absolute inset-0">
-                <div class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20"></div>
-            </div>
-            
+        <section class="hero-section d-flex align-items-center position-relative" style="padding-top: 80px;">
             <!-- Floating Elements -->
-            <div class="absolute top-20 left-10 w-20 h-20 bg-white/10 rounded-full floating"></div>
-            <div class="absolute top-40 right-20 w-16 h-16 bg-white/10 rounded-full floating" style="animation-delay: 1s;"></div>
-            <div class="absolute bottom-20 left-1/4 w-12 h-12 bg-white/10 rounded-full floating" style="animation-delay: 2s;"></div>
+            <div class="floating-element position-absolute" style="top: 15%; left: 10%; width: 80px; height: 80px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+            <div class="floating-element position-absolute" style="top: 25%; right: 15%; width: 60px; height: 60px; background: rgba(255,255,255,0.08); border-radius: 50%;"></div>
+            <div class="floating-element position-absolute" style="bottom: 20%; left: 20%; width: 100px; height: 100px; background: rgba(255,255,255,0.05); border-radius: 50%;"></div>
             
-            <div class="relative z-10 flex items-center justify-center min-h-screen">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="text-center fade-in">
-                        <h1 class="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight">
-                            <span class="block">Efficient Complaint</span>
-                            <span class="block text-yellow-300">Management System</span>
+            <div class="container position-relative z-3">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 fade-in-up">
+                        <h1 class="hero-title fw-bold text-white text-shadow mb-4">
+                            <span class="d-block">Efficient</span>
+                            <span class="d-block">Complaint</span>
+                            <span class="d-block highlight wave-animation">Management</span>
+                            <span class="d-block highlight wave-animation">System</span>
                         </h1>
-                        <p class="mt-6 text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
+                        <p class="lead text-white-75 mb-5 fs-5">
                             Streamline your complaint and service request tracking with our comprehensive management system. 
                             Submit, track, and resolve issues efficiently with real-time updates and detailed reporting.
                         </p>
-                        <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+                        <div class="d-flex flex-column flex-sm-row gap-3">
                             @auth
-                                <a href="{{ url('/dashboard') }}" class="inline-flex items-center px-8 py-4 border-2 border-white text-white font-semibold rounded-full text-lg hover:bg-white hover:text-blue-600 transition-all duration-300 transform hover:scale-105">
-                                    <i class="fas fa-rocket mr-2"></i>Go to Dashboard
+                                <a href="{{ url('/dashboard') }}" class="btn btn-light btn-lg btn-modern">
+                                    <i class="fas fa-rocket me-2"></i>Go to Dashboard
                                 </a>
                             @else
-                                <a href="{{ route('register') }}" class="inline-flex items-center px-8 py-4 bg-white text-blue-600 font-semibold rounded-full text-lg hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg">
-                                    <i class="fas fa-play mr-2"></i>Get Started Free
+                                <a href="{{ route('register') }}" class="btn btn-light btn-lg btn-modern pulse-glow">
+                                    <i class="fas fa-play me-2"></i>Get Started
                                 </a>
-                                <a href="{{ route('login') }}" class="inline-flex items-center px-8 py-4 border-2 border-white text-white font-semibold rounded-full text-lg hover:bg-white hover:text-blue-600 transition-all duration-300 transform hover:scale-105">
-                                    <i class="fas fa-sign-in-alt mr-2"></i>Sign In
+                                <a href="{{ route('login') }}" class="btn btn-outline-light btn-lg btn-modern">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                                </a>
+                            @endauth
+                        </div>
+                    </div>
+                    <div class="col-lg-6 d-none d-lg-block slide-in-right">
+                        <div class="text-center">
+                            <div class="gradient-border p-4 d-inline-block">
+                                <i class="fas fa-chart-line text-primary" style="font-size: 8rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="py-5 bg-custom-light">
+            <div class="section-divider"></div>
+            <div class="container py-5">
+                <div class="row justify-content-center text-center mb-5">
+                    <div class="col-lg-8 slide-in-left">
+                        <h2 class="display-5 fw-bold mb-4">
+                            <span class="gradient-text">Powerful Features</span>
+                        </h2>
+                        <p class="lead text-muted">
+                            Everything you need to manage complaints efficiently and provide excellent customer service
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="feature-card p-4 h-100 text-center">
+                            <div class="feature-icon primary">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">Easy Submission</h4>
+                            <p class="text-muted">
+                                Submit complaints quickly with our user-friendly form. Categorize and prioritize issues for efficient handling.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-3">
+                        <div class="feature-card p-4 h-100 text-center">
+                            <div class="feature-icon secondary">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">Real-time Tracking</h4>
+                            <p class="text-muted">
+                                Track the status of your complaints in real-time. Get instant updates on progress and resolution.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-3">
+                        <div class="feature-card p-4 h-100 text-center">
+                            <div class="feature-icon accent">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">Role-based Access</h4>
+                            <p class="text-muted">
+                                Secure role-based access control for users, staff, and administrators with appropriate permissions.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-3">
+                        <div class="feature-card p-4 h-100 text-center">
+                            <div class="feature-icon success">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">Smart Reports</h4>
+                            <p class="text-muted">
+                                Generate detailed reports and analytics to monitor performance and identify areas for improvement.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="py-5" style="background: var(--primary-gradient);">
+            <div class="container">
+                <div class="row g-4 text-center">
+                    <div class="col-md-4">
+                        <div class="stats-card p-4">
+                            <div class="display-4 fw-bold text-white mb-2">99%</div>
+                            <div class="text-white-75 fs-5">Resolution Rate</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stats-card p-4">
+                            <div class="display-4 fw-bold text-white mb-2">24/7</div>
+                            <div class="text-white-75 fs-5">Support Available</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stats-card p-4">
+                            <div class="display-4 fw-bold text-white mb-2">5min</div>
+                            <div class="text-white-75 fs-5">Average Response</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="py-5 bg-custom-dark">
+            <div class="section-divider-reverse"></div>
+            <div class="container py-5">
+                <div class="row justify-content-center text-center">
+                    <div class="col-lg-8">
+                        <h2 class="display-5 fw-bold text-white mb-4">Ready to Get Started?</h2>
+                        <p class="lead text-white-75 mb-5" style="color: white;">
+                            Join thousands of organizations that trust our complaint management system
+                        </p>
+                        <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                            @auth
+                                <a href="{{ url('/dashboard') }}" class="btn btn-primary btn-lg btn-modern">
+                                    <i class="fas fa-rocket me-2"></i>Access Dashboard
+                                </a>
+                            @else
+                                <a href="{{ route('register') }}" class="btn btn-primary btn-lg btn-modern">
+                                    <i class="fas fa-user-plus me-2"></i>Start Free Trial
+                                </a>
+                                <a href="{{ route('login') }}" class="btn btn-outline-light btn-lg btn-modern">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Sign In
                                 </a>
                             @endauth
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Features Section -->
-        <div class="py-20 bg-gray-50">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-16 slide-in">
-                    <h2 class="text-4xl font-bold text-gray-900 mb-4">
-                        <span class="gradient-bg bg-clip-text text-transparent">Powerful Features</span>
-                    </h2>
-                    <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-                        Everything you need to manage complaints efficiently and provide excellent customer service
-                    </p>
-                </div>
-
-                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div class="feature-card bg-white p-8 rounded-2xl shadow-lg text-center">
-                        <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <i class="fas fa-plus text-white text-2xl"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-4">Easy Submission</h3>
-                        <p class="text-gray-600">
-                            Submit complaints quickly with our user-friendly form. Categorize and prioritize issues for efficient handling.
-                        </p>
-                    </div>
-
-                    <div class="feature-card bg-white p-8 rounded-2xl shadow-lg text-center">
-                        <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <i class="fas fa-chart-line text-white text-2xl"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-4">Real-time Tracking</h3>
-                        <p class="text-gray-600">
-                            Track the status of your complaints in real-time. Get instant updates on progress and resolution.
-                        </p>
-                    </div>
-
-                    <div class="feature-card bg-white p-8 rounded-2xl shadow-lg text-center">
-                        <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <i class="fas fa-users text-white text-2xl"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-4">Role-based Access</h3>
-                        <p class="text-gray-600">
-                            Secure role-based access control for users, staff, and administrators with appropriate permissions.
-                        </p>
-                    </div>
-
-                    <div class="feature-card bg-white p-8 rounded-2xl shadow-lg text-center">
-                        <div class="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <i class="fas fa-file-alt text-white text-2xl"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-4">Smart Reports</h3>
-                        <p class="text-gray-600">
-                            Generate detailed reports and analytics to monitor performance and identify areas for improvement.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Stats Section -->
-        <div class="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                    <div class="glass-effect p-8 rounded-2xl">
-                        <div class="text-4xl font-bold text-white mb-2">99%</div>
-                        <div class="text-white/80">Resolution Rate</div>
-                    </div>
-                    <div class="glass-effect p-8 rounded-2xl">
-                        <div class="text-4xl font-bold text-white mb-2">24/7</div>
-                        <div class="text-white/80">Support Available</div>
-                    </div>
-                    <div class="glass-effect p-8 rounded-2xl">
-                        <div class="text-4xl font-bold text-white mb-2">5min</div>
-                        <div class="text-white/80">Average Response</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </section>
 
         <!-- Footer -->
-        <footer class="bg-gray-900 text-white">
-            <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-                <div class="text-center">
-                    <div class="flex justify-center space-x-6 mb-4">
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">
-                            <i class="fab fa-twitter text-xl"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">
-                            <i class="fab fa-facebook text-xl"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">
-                            <i class="fab fa-linkedin text-xl"></i>
-                        </a>
+        <footer class="bg-custom-dark text-white py-5">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-center text-md-start">
+                        <div class="d-flex align-items-center justify-content-center justify-content-md-start mb-3">
+                            <div class="bg-primary rounded-lg p-2 me-2">
+                                <i class="fas fa-shield-alt text-white"></i>
+                            </div>
+                            <span class="gradient-text fw-bold fs-4">CSRTS</span>
+                        </div>
+                        <p class="text-white-75 mb-0">&copy; 2024 Complaint & Service Request Tracking System. All rights reserved.</p>
                     </div>
-                    <p class="text-gray-400">&copy; 2024 Complaint & Service Request Tracking System. All rights reserved.</p>
+                    <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
+                        <div class="d-flex justify-content-center justify-content-md-end gap-3">
+                            <a href="#" class="text-white-50 hover:text-white transition-colors">
+                                <i class="fab fa-twitter fs-4"></i>
+                            </a>
+                            <a href="#" class="text-white-50 hover:text-white transition-colors">
+                                <i class="fab fa-facebook fs-4"></i>
+                            </a>
+                            <a href="#" class="text-white-50 hover:text-white transition-colors">
+                                <i class="fab fa-linkedin fs-4"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </footer>
 
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        
         <script>
-            // Add scroll animations
+            // Navbar scroll effect
+            window.addEventListener('scroll', function() {
+                const navbar = document.getElementById('mainNavbar');
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+
+            // Intersection Observer for animations
             const observerOptions = {
                 threshold: 0.1,
                 rootMargin: '0px 0px -50px 0px'
@@ -243,11 +619,26 @@
                 });
             }, observerOptions);
 
+            // Observe feature cards
             document.querySelectorAll('.feature-card').forEach(card => {
                 card.style.opacity = '0';
                 card.style.transform = 'translateY(30px)';
                 card.style.transition = 'all 0.6s ease-out';
                 observer.observe(card);
+            });
+
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
             });
         </script>
     </body>

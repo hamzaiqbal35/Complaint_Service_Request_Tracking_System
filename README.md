@@ -1,61 +1,286 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Complaint & Service Request Tracking System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A comprehensive Laravel-based complaint management system with JWT authentication and role-based access control.
 
-## About Laravel
+## 🚀 Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **JWT Authentication**: Secure token-based authentication with local storage
+- **Role-Based Access**: Three user roles (User, Staff, Admin)
+- **Modern UI**: Bootstrap 5 with custom styling and animations
+- **Real-time Updates**: Live complaint status tracking
+- **Password Reset**: Complete forgot password functionality
+- **Responsive Design**: Works on all devices
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🏗️ System Architecture
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### User Roles & Access
 
-## Learning Laravel
+1. **Users** (`/dashboard`)
+   - Submit new complaints
+   - View their own complaints
+   - Track complaint status
+   - Update profile
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+2. **Staff** (`/staff/complaints`)
+   - View assigned complaints
+   - Update complaint status
+   - Add notes to complaints
+   - Manage their workload
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+3. **Admin** (`/admin/complaints`)
+   - View all complaints
+   - Assign complaints to staff
+   - Update complaint status
+   - System-wide statistics
+   - User management
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 🔐 Authentication System
 
-## Laravel Sponsors
+### JWT Token Management
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- **Login**: `/jwt/login` - Modern login interface with role selection
+- **Token Storage**: JWT tokens stored in localStorage
+- **Session Management**: Separate sessions for each role
+- **Logout**: Automatic token invalidation and cleanup
 
-### Premium Partners
+### Password Reset Flow
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+1. **Forgot Password**: `/jwt/forgot-password`
+2. **Reset Link**: Email with secure reset token
+3. **Reset Password**: `/jwt/reset-password/{token}`
 
-## Contributing
+## 🎨 UI Improvements
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Dashboard Features
 
-## Code of Conduct
+- **Horizontal Card Layout**: Statistics cards in modern horizontal design
+- **Real-time Statistics**: Live complaint counts and percentages
+- **Quick Actions**: Easy access to common tasks
+- **Recent Activity**: Timeline of recent complaints
+- **Responsive Design**: Mobile-friendly interface
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Modern Styling
 
-## Security Vulnerabilities
+- **Gradient Backgrounds**: Beautiful gradient designs
+- **Card Animations**: Hover effects and smooth transitions
+- **Icon Integration**: Font Awesome icons throughout
+- **Color-coded Status**: Visual status indicators
+- **Loading States**: Professional loading animations
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 🛠️ Installation & Setup
 
-## License
+### Prerequisites
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- PHP 8.2+
+- Composer
+- Node.js & NPM
+- SQLite (or MySQL/PostgreSQL)
+
+### Installation Steps
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd Complaint_Service_Request_Tracking_System
+   ```
+
+2. **Install dependencies**
+   ```bash
+   composer install
+   npm install
+   ```
+
+3. **Environment setup**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   php artisan jwt:secret
+   ```
+
+4. **Database setup**
+   ```bash
+   php artisan migrate:fresh --seed
+   ```
+
+5. **Build assets**
+   ```bash
+   npm run dev
+   ```
+
+6. **Start the server**
+   ```bash
+   php artisan serve
+   ```
+
+## 🔑 Default Login Credentials
+
+After seeding, you can login with these credentials:
+
+### Admin User
+- **Email**: admin@example.com
+- **Password**: password
+- **Role**: Admin
+
+### Staff Users
+- **Email**: staff@example.com (or any staff email)
+- **Password**: password
+- **Role**: Staff
+
+### Regular Users
+- **Email**: user@example.com (or any user email)
+- **Password**: password
+- **Role**: User
+
+## 🚪 How to Access Different Panels
+
+### 1. JWT Login System
+
+Visit `/jwt/login` to access the new JWT authentication system.
+
+### 2. Role-Based Access
+
+#### For Users:
+- **Dashboard**: `/dashboard`
+- **My Complaints**: `/complaints`
+- **New Complaint**: `/complaints/create`
+
+#### For Staff:
+- **Assigned Complaints**: `/staff/complaints`
+- **Update Status**: Available in complaint details
+
+#### For Admin:
+- **All Complaints**: `/admin/complaints`
+- **Manage Complaints**: `/admin/complaints/{id}/edit`
+- **System Statistics**: Available on admin dashboard
+
+### 3. Navigation
+
+The navigation bar automatically shows relevant links based on your role:
+- **Users**: Dashboard, My Complaints, New Complaint
+- **Staff**: Assigned Complaints, My Assignments
+- **Admin**: All Complaints, Manage Complaints
+
+## 🔧 API Endpoints
+
+### Authentication
+- `POST /api/login` - JWT login
+- `POST /api/register` - User registration
+- `POST /api/logout` - JWT logout
+- `POST /api/refresh` - Token refresh
+- `GET /api/me` - Get current user
+
+### Password Reset
+- `POST /api/forgot-password` - Send reset link
+- `POST /api/reset-password` - Reset password
+
+### Complaints
+- `GET /api/complaints` - List complaints (role-based)
+- `GET /api/complaints/{id}` - Get complaint details
+
+## 🎯 Key Features Explained
+
+### 1. JWT Authentication Flow
+
+```javascript
+// Login process
+1. User submits credentials
+2. Server validates and returns JWT token
+3. Token stored in localStorage
+4. Token used for subsequent requests
+5. Automatic role-based redirect
+```
+
+### 2. Separate Sessions
+
+- Each role has its own session
+- Tokens are role-specific
+- Logout clears all session data
+- Automatic token refresh
+
+### 3. Dashboard Improvements
+
+- **Horizontal Layout**: Cards arranged horizontally for better space usage
+- **Real-time Stats**: Live complaint statistics
+- **Quick Actions**: Easy access to common tasks
+- **Modern UI**: Bootstrap 5 with custom styling
+
+### 4. Password Reset System
+
+- **Secure Tokens**: Time-limited reset tokens
+- **Email Integration**: Automatic email sending
+- **User-friendly**: Simple reset process
+- **Validation**: Proper password validation
+
+## 🚨 Security Features
+
+- **JWT Token Invalidation**: Tokens are properly invalidated on logout
+- **Role-based Middleware**: Access control for all routes
+- **CSRF Protection**: All forms protected
+- **Input Validation**: Comprehensive validation rules
+- **Secure Password Reset**: Time-limited tokens
+
+## 📱 Responsive Design
+
+- **Mobile-first**: Optimized for mobile devices
+- **Tablet Support**: Responsive on tablets
+- **Desktop Optimization**: Full-featured desktop experience
+- **Touch-friendly**: Optimized for touch interfaces
+
+## 🔄 Development Workflow
+
+### Adding New Features
+
+1. **Create Migration**: `php artisan make:migration create_new_table`
+2. **Create Model**: `php artisan make:model NewModel`
+3. **Create Controller**: `php artisan make:controller NewController`
+4. **Add Routes**: Update `routes/web.php` or `routes/api.php`
+5. **Create Views**: Add Blade templates
+6. **Test**: Verify functionality
+
+### Testing
+
+```bash
+# Run tests
+php artisan test
+
+# Run specific test
+php artisan test --filter TestName
+```
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+1. **JWT Token Issues**
+   - Clear localStorage
+   - Check token expiration
+   - Verify JWT secret
+
+2. **Database Issues**
+   - Run migrations: `php artisan migrate:fresh --seed`
+   - Check database connection
+   - Verify .env configuration
+
+3. **Asset Issues**
+   - Run: `npm run dev`
+   - Clear cache: `php artisan cache:clear`
+   - Check Vite configuration
+
+## 📞 Support
+
+For issues or questions:
+1. Check the troubleshooting section
+2. Review the logs in `storage/logs/`
+3. Verify your environment setup
+4. Check Laravel documentation
+
+## 🎉 Conclusion
+
+This system provides a complete, modern complaint management solution with:
+- Secure JWT authentication
+- Role-based access control
+- Modern, responsive UI
+- Complete password reset functionality
+- Real-time statistics and tracking
+
+The dashboard has been completely redesigned with horizontal card layouts, modern styling, and improved user experience across all devices.

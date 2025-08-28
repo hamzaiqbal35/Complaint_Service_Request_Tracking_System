@@ -14,7 +14,20 @@ class ComplaintAdminController extends Controller
     public function index()
     {
         $complaints = Complaint::with('category','creator','assignee')->latest()->paginate(15);
-        return view('admin.complaints.index', compact('complaints'));
+        
+        // System-wide statistics
+        $stats = [
+            'total' => Complaint::count(),
+            'pending' => Complaint::where('status', 'pending')->count(),
+            'in_progress' => Complaint::where('status', 'in_progress')->count(),
+            'resolved' => Complaint::where('status', 'resolved')->count(),
+            'rejected' => Complaint::where('status', 'rejected')->count(),
+            'unassigned' => Complaint::whereNull('assigned_to')->count(),
+            'total_users' => User::where('role', 'user')->count(),
+            'total_staff' => User::where('role', 'staff')->count(),
+        ];
+        
+        return view('admin.complaints.index', compact('complaints', 'stats'));
     }
 
     public function edit(Complaint $complaint)
