@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('admin')
+@section('content')  <!-- Change from @section('admin') to @section('content') -->
 <div class="container mx-auto px-4">
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold text-gray-900">All Complaints</h1>
@@ -35,21 +35,29 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $complaint->title }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $complaint->category->name }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                    @if($complaint->priority === 'high') bg-red-100 text-red-800
-                                    @elseif($complaint->priority === 'medium') bg-yellow-100 text-yellow-800
-                                    @else bg-green-100 text-green-800
-                                    @endif">
+                                @php
+                                    $priorityClasses = [
+                                        'high' => 'badge bg-danger',
+                                        'medium' => 'badge bg-warning',
+                                        'low' => 'badge bg-success'
+                                    ];
+                                    $priorityClass = $priorityClasses[$complaint->priority] ?? 'badge bg-secondary';
+                                @endphp
+                                <span class="{{ $priorityClass }}">
                                     {{ ucfirst($complaint->priority) }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                    @if($complaint->status === 'pending') bg-gray-100 text-gray-800
-                                    @elseif($complaint->status === 'in_progress') bg-blue-100 text-blue-800
-                                    @elseif($complaint->status === 'resolved') bg-green-100 text-green-800
-                                    @else bg-red-100 text-red-800
-                                    @endif">
+                                @php
+                                    $statusClasses = [
+                                        'pending' => 'badge bg-warning',
+                                        'in_progress' => 'badge bg-info',
+                                        'resolved' => 'badge bg-success',
+                                        'rejected' => 'badge bg-danger'
+                                    ];
+                                    $statusClass = $statusClasses[$complaint->status] ?? 'badge bg-secondary';
+                                @endphp
+                                <span class="{{ $statusClass }}">
                                     {{ ucfirst(str_replace('_', ' ', $complaint->status)) }}
                                 </span>
                             </td>
@@ -78,4 +86,39 @@
         </div>
     @endif
 </div>
+
+<style>
+.badge {
+    display: inline-block;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+}
+
+.bg-info {
+    background-color: #36b9cc !important;
+}
+
+.bg-warning {
+    background-color: #f6c23e !important;
+}
+
+.bg-danger {
+    background-color: #e74a3b !important;
+}
+
+.bg-success {
+    background-color: #1cc88a !important;
+}
+
+.bg-secondary {
+    background-color: #858796 !important;
+}
+</style>
 @endsection

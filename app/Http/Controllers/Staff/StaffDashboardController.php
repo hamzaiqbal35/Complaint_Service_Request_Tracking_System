@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Staff;
 
+use App\Http\Controllers\Controller;
 use App\Models\Complaint;
 use App\Models\Category;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
-class DashboardController extends Controller
+class StaffDashboardController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Complaint::with('category', 'assignee')
-            ->where('created_by', auth()->id());
+        $query = Complaint::with('category', 'assignee', 'creator')
+            ->where('assigned_to', auth()->id());
 
         // Apply filters
         if ($request->filled('status')) {
@@ -42,8 +42,8 @@ class DashboardController extends Controller
 
         $complaints = $query->paginate(10)->withQueryString();
 
-        // Get filtered statistics
-        $baseQuery = Complaint::where('created_by', auth()->id());
+        // Get filtered statistics for assigned complaints
+        $baseQuery = Complaint::where('assigned_to', auth()->id());
         
         if ($request->filled('status')) {
             $baseQuery->where('status', $request->status);
@@ -62,22 +62,30 @@ class DashboardController extends Controller
         }
 
         $stats = [
-            'total' => (clone $baseQuery)->count(),
+            'total_assigned' => (clone $baseQuery)->count(),
             'pending' => (clone $baseQuery)->where('status', 'pending')->count(),
             'in_progress' => (clone $baseQuery)->where('status', 'in_progress')->count(),
             'resolved' => (clone $baseQuery)->where('status', 'resolved')->count(),
             'rejected' => (clone $baseQuery)->where('status', 'rejected')->count(),
         ];
 
+        // Additional stats for staff dashboard
+        $additionalStats = [
+            'total_complaints' => Complaint::count(),
+            'unassigned_complaints' => Complaint::whereNull('assigned_to')->count(),
+            'my_resolution_rate' => $stats['total_assigned'] > 0 ? round(($stats['resolved'] / $stats['total_assigned']) * 100) : 0,
+            'avg_response_time' => $this->getAverageResponseTime(),
+        ];
+
         $categories = Category::all();
 
-        return view('dashboard', compact('complaints', 'stats', 'categories'));
+        return view('staff.dashboard', compact('complaints', 'stats', 'additionalStats', 'categories'));
     }
 
     public function export(Request $request)
     {
         $query = Complaint::with('category', 'assignee', 'creator')
-            ->where('created_by', auth()->id());
+            ->where('assigned_to', auth()->id());
 
         // Apply same filters as dashboard
         if ($request->filled('status')) {
@@ -98,7 +106,7 @@ class DashboardController extends Controller
 
         $complaints = $query->get();
 
-        $filename = 'complaints_export_' . date('Y-m-d_H-i-s') . '.csv';
+        $filename = 'staff_complaints_export_' . date('Y-m-d_H-i-s') . '.csv';
         
         $headers = [
             'Content-Type' => 'text/csv',
@@ -116,7 +124,7 @@ class DashboardController extends Controller
                 'Category',
                 'Priority',
                 'Status',
-                'Assigned To',
+                'Created By',
                 'Created At',
                 'Updated At'
             ]);
@@ -130,7 +138,7 @@ class DashboardController extends Controller
                     $complaint->category->name ?? 'N/A',
                     ucfirst($complaint->priority),
                     ucfirst(str_replace('_', ' ', $complaint->status)),
-                    $complaint->assignee->name ?? 'Unassigned',
+                    $complaint->creator->name ?? 'N/A',
                     $complaint->created_at->format('Y-m-d H:i:s'),
                     $complaint->updated_at->format('Y-m-d H:i:s')
                 ]);
@@ -140,5 +148,24 @@ class DashboardController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    private function getAverageResponseTime()
+    {
+        $resolvedComplaints = Complaint::where('assigned_to', auth()->id())
+            ->where('status', 'resolved')
+            ->whereNotNull('resolved_at')
+            ->get();
+
+        if ($resolvedComplaints->isEmpty()) {
+            return 0;
+        }
+
+        $totalHours = 0;
+        foreach ($resolvedComplaints as $complaint) {
+            $totalHours += $complaint->created_at->diffInHours($complaint->resolved_at);
+        }
+
+        return round($totalHours / $resolvedComplaints->count(), 1);
     }
 }

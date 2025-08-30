@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('admin')
+@section('content')  <!-- Change from @section('admin') to @section('content') -->
 <div class="container mx-auto px-4">
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold text-gray-900">Manage Complaint #{{ $complaint->id }}</h1>
@@ -23,38 +23,42 @@
                 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Title</label>
+                        <span class="block text-sm font-medium text-gray-700">Title</span>
                         <p class="mt-1 text-sm text-gray-900">{{ $complaint->title }}</p>
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Description</label>
+                        <span class="block text-sm font-medium text-gray-700">Description</span>
                         <p class="mt-1 text-sm text-gray-900">{{ $complaint->description }}</p>
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Category</label>
+                        <span class="block text-sm font-medium text-gray-700">Category</span>
                         <p class="mt-1 text-sm text-gray-900">{{ $complaint->category->name }}</p>
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Priority</label>
-                        <span class="mt-1 px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                            @if($complaint->priority === 'high') bg-red-100 text-red-800
-                            @elseif($complaint->priority === 'medium') bg-yellow-100 text-yellow-800
-                            @else bg-green-100 text-green-800
-                            @endif">
+                        <span class="block text-sm font-medium text-gray-700">Priority</span>
+                        @php
+                            $priorityClasses = [
+                                'high' => 'badge bg-danger',
+                                'medium' => 'badge bg-warning',
+                                'low' => 'badge bg-success'
+                            ];
+                            $priorityClass = $priorityClasses[$complaint->priority] ?? 'badge bg-secondary';
+                        @endphp
+                        <span class="mt-1 {{ $priorityClass }}">
                             {{ ucfirst($complaint->priority) }}
                         </span>
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Created By</label>
+                        <span class="block text-sm font-medium text-gray-700">Created By</span>
                         <p class="mt-1 text-sm text-gray-900">{{ $complaint->creator->name }}</p>
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Created At</label>
+                        <span class="block text-sm font-medium text-gray-700">Created At</span>
                         <p class="mt-1 text-sm text-gray-900">{{ $complaint->created_at->format('M d, Y H:i') }}</p>
                     </div>
                 </div>
@@ -84,7 +88,8 @@
                             </select>
                         </div>
                         
-                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-black bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-user-plus mr-2"></i>
                             Update Assignment
                         </button>
                     </form>
@@ -115,7 +120,8 @@
                             <textarea name="message" id="message" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Add a note about this status change..."></textarea>
                         </div>
                         
-                        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-black bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            <i class="fas fa-sync-alt mr-2"></i>
                             Update Status
                         </button>
                     </form>
@@ -129,25 +135,29 @@
                     
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Status</label>
-                            <span class="mt-1 px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                @if($complaint->status === 'pending') bg-gray-100 text-gray-800
-                                @elseif($complaint->status === 'in_progress') bg-blue-100 text-blue-800
-                                @elseif($complaint->status === 'resolved') bg-green-100 text-green-800
-                                @else bg-red-100 text-red-800
-                                @endif">
+                            <span class="block text-sm font-medium text-gray-700">Status</span>
+                            @php
+                                $statusClasses = [
+                                    'pending' => 'badge bg-warning',
+                                    'in_progress' => 'badge bg-info',
+                                    'resolved' => 'badge bg-success',
+                                    'rejected' => 'badge bg-danger'
+                                ];
+                                $statusClass = $statusClasses[$complaint->status] ?? 'badge bg-secondary';
+                            @endphp
+                            <span class="mt-1 {{ $statusClass }}">
                                 {{ ucfirst(str_replace('_', ' ', $complaint->status)) }}
                             </span>
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Assigned To</label>
+                            <span class="block text-sm font-medium text-gray-700">Assigned To</span>
                             <p class="mt-1 text-sm text-gray-900">{{ $complaint->assignee ? $complaint->assignee->name : 'Unassigned' }}</p>
                         </div>
                         
                         @if($complaint->resolved_at)
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Resolved At</label>
+                                <span class="block text-sm font-medium text-gray-700">Resolved At</span>
                                 <p class="mt-1 text-sm text-gray-900">{{ $complaint->resolved_at->format('M d, Y H:i') }}</p>
                             </div>
                         @endif
@@ -157,4 +167,64 @@
         </div>
     </div>
 </div>
+
+<style>
+.badge {
+    display: inline-block;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+}
+
+.bg-info {
+    background-color: #36b9cc !important;
+}
+
+.bg-warning {
+    background-color: #f6c23e !important;
+}
+
+.bg-danger {
+    background-color: #e74a3b !important;
+}
+
+.bg-success {
+    background-color: #1cc88a !important;
+}
+
+.bg-secondary {
+    background-color: #858796 !important;
+}
+
+button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.5rem;
+    margin-top: 0.5rem;
+    transition: all 0.2s;
+    width: auto !important;
+    min-width: 150px;
+}
+
+button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+.fas {
+    display: inline-block;
+    line-height: 1;
+}
+</style>
 @endsection

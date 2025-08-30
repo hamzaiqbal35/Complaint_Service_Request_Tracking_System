@@ -30,6 +30,8 @@ class Kernel extends HttpKernel
      */
     protected $middlewareGroups = [
         'web' => [
+            // Add rate limiting
+            \Illuminate\Routing\Middleware\ThrottleRequests::class.':60,1',
             \App\Http\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
@@ -39,8 +41,9 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
-            // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-            \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            // Add stricter rate limiting for API
+            \Illuminate\Routing\Middleware\ThrottleRequests::class.':30,1',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];

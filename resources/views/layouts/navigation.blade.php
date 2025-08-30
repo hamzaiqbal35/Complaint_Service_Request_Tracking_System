@@ -21,12 +21,24 @@
                                 {{ __('My Complaints') }}
                             </x-nav-link>
                         @elseif(auth()->user()->isStaff())
-                            <x-nav-link :href="route('staff.complaints.index')" :active="request()->routeIs('staff.*')">
+                            <x-nav-link :href="route('staff.dashboard')" :active="request()->routeIs('staff.dashboard')">
+                                {{ __('Dashboard') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('staff.complaints.index')" :active="request()->routeIs('staff.complaints.*')">
                                 {{ __('Assigned Complaints') }}
                             </x-nav-link>
                         @elseif(auth()->user()->isAdmin())
-                            <x-nav-link :href="route('admin.complaints.index')" :active="request()->routeIs('admin.*')">
+                            <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                                {{ __('Dashboard') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('admin.complaints.index')" :active="request()->routeIs('admin.complaints.*')">
                                 {{ __('All Complaints') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                                {{ __('Users') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('admin.categories.index')" :active="request()->routeIs('admin.categories.*')">
+                                {{ __('Categories') }}
                             </x-nav-link>
                         @endif
                     @endauth
@@ -38,9 +50,9 @@
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div class="d-flex align-items-center">
-                                <span class="me-2">{{ Auth::user()->name }}</span>
-                                <span class="badge bg-primary">{{ ucfirst(Auth::user()->role) }}</span>
+                            <div class="flex items-center">
+                                <span class="mr-2">{{ Auth::user()->name }}</span>
+                                <span class="px-2 py-1 text-xs font-semibold text-white bg-blue-600 rounded">{{ ucfirst(Auth::user()->role) }}</span>
                             </div>
 
                             <div class="ms-1">
@@ -108,12 +120,24 @@
                         {{ __('My Complaints') }}
                     </x-responsive-nav-link>
                 @elseif(auth()->user()->isStaff())
-                    <x-responsive-nav-link :href="route('staff.complaints.index')" :active="request()->routeIs('staff.*')">
+                    <x-responsive-nav-link :href="route('staff.dashboard')" :active="request()->routeIs('staff.dashboard')">
+                        {{ __('Dashboard') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('staff.complaints.index')" :active="request()->routeIs('staff.complaints.*')">
                         {{ __('Assigned Complaints') }}
                     </x-responsive-nav-link>
                 @elseif(auth()->user()->isAdmin())
-                    <x-responsive-nav-link :href="route('admin.complaints.index')" :active="request()->routeIs('admin.*')">
+                    <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                        {{ __('Dashboard') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('admin.complaints.index')" :active="request()->routeIs('admin.complaints.*')">
                         {{ __('All Complaints') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                        {{ __('Users') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('admin.categories.index')" :active="request()->routeIs('admin.categories.*')">
+                        {{ __('Categories') }}
                     </x-responsive-nav-link>
                 @endif
             @endauth
@@ -125,7 +149,7 @@
                 <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
                 <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
                 <div class="mt-1">
-                    <span class="badge bg-primary">{{ ucfirst(Auth::user()->role) }}</span>
+                    <span class="px-2 py-1 text-xs font-semibold text-white bg-blue-600 rounded">{{ ucfirst(Auth::user()->role) }}</span>
                 </div>
             </div>
 

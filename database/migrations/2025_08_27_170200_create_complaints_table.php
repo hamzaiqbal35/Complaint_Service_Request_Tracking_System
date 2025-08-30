@@ -19,6 +19,7 @@ return new class extends Migration
             $table->enum('status', ['pending', 'in_progress', 'resolved', 'rejected'])->default('pending')->index();
             $table->timestamp('resolved_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
             $table->index(['category_id', 'priority', 'status']);
         });
     }
