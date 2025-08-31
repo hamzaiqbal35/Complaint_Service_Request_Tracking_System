@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-4">
         <h1 class="h3 mb-0 text-gray-800">Category Details</h1>
         <div class="d-flex gap-2">
             <a href="{{ route('admin.categories.edit', $category) }}" class="btn btn-primary">
@@ -111,12 +111,12 @@
                                     <td>{{ $complaint->id }}</td>
                                     <td>{{ Str::limit($complaint->title, 30) }}</td>
                                     <td>
-                                        <span class="badge badge-{{ $complaint->priority == 'high' ? 'danger' : ($complaint->priority == 'medium' ? 'warning' : 'secondary') }}">
+                                        <span class="badge bg-{{ $complaint->priority == 'high' ? 'danger' : ($complaint->priority == 'medium' ? 'warning' : 'secondary') }} text-white">
                                             {{ ucfirst($complaint->priority) }}
                                         </span>
                                     </td>
                                     <td>
-                                        <span class="badge badge-{{ $complaint->status == 'resolved' ? 'success' : ($complaint->status == 'in_progress' ? 'info' : ($complaint->status == 'rejected' ? 'danger' : 'warning')) }}">
+                                        <span class="badge bg-{{ $complaint->status == 'resolved' ? 'success' : ($complaint->status == 'in_progress' ? 'info' : ($complaint->status == 'rejected' ? 'danger' : 'warning')) }} text-white">
                                             {{ ucfirst(str_replace('_', ' ', $complaint->status)) }}
                                         </span>
                                     </td>

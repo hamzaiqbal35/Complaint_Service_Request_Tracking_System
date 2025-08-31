@@ -2,10 +2,10 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-4">
         <h1 class="h3 mb-0 text-gray-800">Admin Dashboard</h1>
         <div class="d-flex gap-2">
-            <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
+            <button id="filterToggleBtn" class="btn btn-outline-primary">
                 <i class="fas fa-filter"></i> Filters
             </button>
             <a href="{{ route('admin.dashboard.export', request()->query()) }}" class="btn btn-success">
@@ -15,13 +15,13 @@
     </div>
 
     <!-- Filter Section -->
-    <div class="collapse mb-4" id="filterCollapse">
+    <div id="filterCollapse" class="mb-4" style="display: none;">
         <div class="card">
             <div class="card-body">
-                <form method="GET" action="{{ route('admin.dashboard') }}" class="row g-3">
+                <form id="filterForm" method="GET" action="{{ route('admin.dashboard') }}" class="row g-3">
                     <div class="col-md-2">
                         <label for="status" class="form-label">Status</label>
-                        <select name="status" id="status" class="form-select">
+                        <select name="status" id="status" class="form-select rounded-3">
                             <option value="">All Statuses</option>
                             <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
                             <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
@@ -31,7 +31,7 @@
                     </div>
                     <div class="col-md-2">
                         <label for="priority" class="form-label">Priority</label>
-                        <select name="priority" id="priority" class="form-select">
+                        <select name="priority" id="priority" class="form-select rounded-3">
                             <option value="">All Priorities</option>
                             <option value="low" {{ request('priority') == 'low' ? 'selected' : '' }}>Low</option>
                             <option value="medium" {{ request('priority') == 'medium' ? 'selected' : '' }}>Medium</option>
@@ -40,7 +40,7 @@
                     </div>
                     <div class="col-md-2">
                         <label for="category_id" class="form-label">Category</label>
-                        <select name="category_id" id="category_id" class="form-select">
+                        <select name="category_id" id="category_id" class="form-select rounded-3">
                             <option value="">All Categories</option>
                             @foreach($categories as $category)
                                 <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
@@ -51,7 +51,7 @@
                     </div>
                     <div class="col-md-2">
                         <label for="assigned_to" class="form-label">Assigned To</label>
-                        <select name="assigned_to" id="assigned_to" class="form-select">
+                        <select name="assigned_to" id="assigned_to" class="form-select rounded-3">
                             <option value="">All Assignments</option>
                             <option value="unassigned" {{ request('assigned_to') == 'unassigned' ? 'selected' : '' }}>Unassigned</option>
                             @foreach($staffMembers as $staff)
@@ -63,15 +63,15 @@
                     </div>
                     <div class="col-md-2">
                         <label for="date_from" class="form-label">From Date</label>
-                        <input type="date" name="date_from" id="date_from" class="form-control" value="{{ request('date_from') }}">
+                        <input type="date" name="date_from" id="date_from" class="form-control rounded-3" value="{{ request('date_from') }}">
                     </div>
                     <div class="col-md-2">
                         <label for="date_to" class="form-label">To Date</label>
-                        <input type="date" name="date_to" id="date_to" class="form-control" value="{{ request('date_to') }}">
+                        <input type="date" name="date_to" id="date_to" class="form-control rounded-3" value="{{ request('date_to') }}">
                     </div>
                     <div class="col-md-2">
                         <label for="sort_by" class="form-label">Sort By</label>
-                        <select name="sort_by" id="sort_by" class="form-select">
+                        <select name="sort_by" id="sort_by" class="form-select rounded-3">
                             <option value="created_at" {{ request('sort_by') == 'created_at' ? 'selected' : '' }}>Created Date</option>
                             <option value="title" {{ request('sort_by') == 'title' ? 'selected' : '' }}>Title</option>
                             <option value="priority" {{ request('sort_by') == 'priority' ? 'selected' : '' }}>Priority</option>
@@ -81,7 +81,7 @@
                     </div>
                     <div class="col-md-2">
                         <label for="sort_order" class="form-label">Sort Order</label>
-                        <select name="sort_order" id="sort_order" class="form-select">
+                        <select name="sort_order" id="sort_order" class="form-select rounded-3">
                             <option value="desc" {{ request('sort_order') == 'desc' ? 'selected' : '' }}>Descending</option>
                             <option value="asc" {{ request('sort_order') == 'asc' ? 'selected' : '' }}>Ascending</option>
                         </select>
@@ -106,7 +106,7 @@
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['total'] }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                            <i class="fas fa-clipboard-list fa-2x text-blue-800"></i>
                         </div>
                     </div>
                 </div>
@@ -122,7 +122,7 @@
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['pending'] }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                            <i class="fas fa-clock fa-2x text-yellow-800"></i>
                         </div>
                     </div>
                 </div>
@@ -138,7 +138,7 @@
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['in_progress'] }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-spinner fa-2x text-gray-300"></i>
+                            <i class="fas fa-spinner fa-2x text-blue-500"></i>
                         </div>
                     </div>
                 </div>
@@ -154,7 +154,7 @@
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['resolved'] }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                            <i class="fas fa-check-circle fa-2x text-green-600"></i>
                         </div>
                     </div>
                 </div>
@@ -170,7 +170,7 @@
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['rejected'] }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-times-circle fa-2x text-gray-300"></i>
+                            <i class="fas fa-times-circle fa-2x text-red-600"></i>
                         </div>
                     </div>
                 </div>
@@ -205,7 +205,7 @@
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $additionalStats['total_users'] ?? 0 }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                            <i class="fas fa-users fa-2x text-blue-500"></i>
                         </div>
                     </div>
                 </div>
@@ -221,7 +221,7 @@
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $additionalStats['total_staff'] }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-user-tie fa-2x text-gray-300"></i>
+                            <i class="fas fa-user-tie fa-2x text-blue-500"></i>
                         </div>
                     </div>
                 </div>
@@ -237,7 +237,7 @@
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $additionalStats['total_categories'] }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-tags fa-2x text-gray-300"></i>
+                            <i class="fas fa-tags fa-2x text-green-600"></i>
                         </div>
                     </div>
                 </div>
@@ -253,7 +253,7 @@
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $additionalStats['avg_resolution_time'] }}h</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-stopwatch fa-2x text-gray-300"></i>
+                            <i class="fas fa-stopwatch fa-2x text-yellow-800"></i>
                         </div>
                     </div>
                 </div>
@@ -269,7 +269,7 @@
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $additionalStats['high_priority_pending'] }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                            <i class="fas fa-exclamation-triangle fa-2x text-red-600"></i>
                         </div>
                     </div>
                 </div>
@@ -316,13 +316,11 @@
     <div class="card shadow mb-4">
         <div class="card-header py-3">
             <div class="mb-4 flex justify-between items-center">
-                <h2 class="text-xl font-semibold">Complaints List</h2>
+                <h2 class="h4 mb-0">Complaints List</h2>
                 <a href="{{ route('admin.dashboard.export') }}" 
-                   class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded inline-flex items-center">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    Export to CSV
+                   class="btn btn-success d-inline-flex align-items-center">
+                    <i class="fas fa-download me-2"></i>
+                    Export
                 </a>
             </div>
             <h6 class="m-0 font-weight-bold text-primary">Recent Complaints</h6>
@@ -393,6 +391,68 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterBtn = document.getElementById('filterToggleBtn');
+    const filterCollapse = document.getElementById('filterCollapse');
+    const filterForm = document.getElementById('filterForm');
+
+    // Show filters if any are active
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.toString()) {
+        filterCollapse.style.display = 'block';
+    }
+
+    // Toggle filters
+    filterBtn.addEventListener('click', function() {
+        if (filterCollapse.style.display === 'none' || !filterCollapse.style.display) {
+            filterCollapse.style.display = 'block';
+            filterCollapse.style.opacity = '0';
+            setTimeout(() => {
+                filterCollapse.style.opacity = '1';
+            }, 10);
+        } else {
+            filterCollapse.style.opacity = '0';
+            setTimeout(() => {
+                filterCollapse.style.display = 'none';
+            }, 300);
+        }
+    });
+
+    // Handle form submission
+    filterForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(filterForm);
+        const params = new URLSearchParams(formData);
+        window.location.href = `${filterForm.action}?${params.toString()}`;
+    });
+
+    // Date range validation
+    const dateFrom = document.getElementById('date_from');
+    const dateTo = document.getElementById('date_to');
+
+    if (dateFrom && dateTo) {
+        dateFrom.addEventListener('change', function() {
+            dateTo.min = this.value;
+        });
+
+        dateTo.addEventListener('change', function() {
+            dateFrom.max = this.value;
+        });
+    }
+});
+</script>
+@endpush
+
+@push('styles')
+<style>
+#filterCollapse {
+    transition: opacity 0.3s ease-in-out;
+}
+</style>
+@endpush
 
 <style>
 .stat-card {
@@ -480,6 +540,15 @@ document.addEventListener('DOMContentLoaded', function() {
     statCards.forEach((card, index) => {
         card.style.animationDelay = `${index * 0.1}s`;
         card.classList.add('animate__animated', 'animate__fadeInUp');
+    });
+
+    // Toggle filter collapse
+    const filterToggleBtn = document.getElementById('filterToggleBtn');
+    const filterCollapse = document.getElementById('filterCollapse');
+    filterToggleBtn.addEventListener('click', () => {
+        const isCollapsed = filterCollapse.style.display === 'none' || !filterCollapse.style.display;
+        filterCollapse.style.display = isCollapsed ? 'block' : 'none';
+        filterToggleBtn.innerHTML = isCollapsed ? '<i class="fas fa-filter"></i> Hide Filters' : '<i class="fas fa-filter"></i> Filters';
     });
 });
 </script>

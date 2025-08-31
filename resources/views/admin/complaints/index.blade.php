@@ -1,9 +1,10 @@
 @extends('layouts.admin')
 
-@section('content')  <!-- Change from @section('admin') to @section('content') -->
+@section('content')
 <div class="container mx-auto px-4">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">All Complaints</h1>
+    <!-- Modified header section to remove arrow -->
+    <div class="flex justify-between items-center mb-6 mt-4">
+        <h1 class="text-2xl font-bold text-gray-900">Complaints Management</h1>
     </div>
 
     @if(session('success'))

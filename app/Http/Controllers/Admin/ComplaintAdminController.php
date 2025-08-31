@@ -30,6 +30,12 @@ class ComplaintAdminController extends Controller
         return view('admin.complaints.index', compact('complaints', 'stats'));
     }
 
+    public function show(Complaint $complaint)
+    {
+        $complaint->load(['category', 'creator', 'assignee', 'logs.user']);
+        return view('admin.complaints.show', compact('complaint'));
+    }
+
     public function edit(Complaint $complaint)
     {
         $staff = User::where('role','staff')->orderBy('name')->get();
@@ -70,5 +76,3 @@ class ComplaintAdminController extends Controller
         return back()->with('success', 'Status updated.');
     }
 }
-
-

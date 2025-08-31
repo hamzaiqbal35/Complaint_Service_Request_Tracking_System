@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-4">
         <h1 class="h3 mb-0 text-gray-800">User Management</h1>
         <div class="d-flex gap-2">
             <a href="{{ route('admin.users.export', request()->query()) }}" class="btn btn-success">
@@ -82,7 +82,7 @@
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['total'] }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                            <i class="fas fa-users fa-2x text-blue-800"></i>
                         </div>
                     </div>
                 </div>
@@ -98,7 +98,7 @@
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['users'] }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-user fa-2x text-gray-300"></i>
+                            <i class="fas fa-user fa-2x text-blue-500"></i>
                         </div>
                     </div>
                 </div>
@@ -114,7 +114,7 @@
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['staff'] }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-user-tie fa-2x text-gray-300"></i>
+                            <i class="fas fa-user-tie fa-2x text-yellow-800"></i>
                         </div>
                     </div>
                 </div>
@@ -130,7 +130,7 @@
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['admins'] }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-user-shield fa-2x text-gray-300"></i>
+                            <i class="fas fa-user-shield fa-2x text-green-600"></i>
                         </div>
                     </div>
                 </div>
@@ -328,6 +328,59 @@ document.addEventListener('DOMContentLoaded', function() {
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
+
+    // Handle delete form submission
+    const deleteForm = document.getElementById('deleteForm');
+    if (deleteForm) {
+        deleteForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const form = this;
+            const url = form.action;
+            const token = document.querySelector('meta[name="csrf-token"]').content;
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-HTTP-Method-Override': 'DELETE'
+                },
+                body: JSON.stringify({
+                    _method: 'DELETE',
+                    _token: token
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Close the modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+                if (modal) modal.hide();
+                
+                if (data.success) {
+                    // Show success message
+                    if (data.message) {
+                        alert(data.message);
+                    }
+                    // Reload the page to reflect changes
+                    window.location.reload();
+                } else {
+                    throw new Error(data.message || 'Failed to delete user');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error.message || 'An error occurred while deleting the user');
+            });
+        });
+    }
 
     // Add animation to stat cards
     const statCards = document.querySelectorAll('.stat-card');

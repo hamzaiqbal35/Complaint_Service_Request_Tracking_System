@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-4">
         <h1 class="h3 mb-0 text-gray-800">Edit User</h1>
         <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Back to Users
@@ -18,7 +18,7 @@
                 <div class="card-body">
                     <form method="POST" action="{{ route('admin.users.update', $user) }}">
                         @csrf
-                        @method('PATCH')
+                        @method('PUT')
 
                         <div class="row">
                             <div class="col-md-6 mb-3">

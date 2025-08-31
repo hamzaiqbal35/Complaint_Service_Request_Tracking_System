@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-4">
         <h1 class="h3 mb-0 text-gray-800">Category Management</h1>
         <div class="d-flex gap-2">
             <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
@@ -75,7 +75,7 @@
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['total'] }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-tags fa-2x text-gray-300"></i>
+                            <i class="fas fa-tags fa-2x text-blue-800"></i>
                         </div>
                     </div>
                 </div>
@@ -91,7 +91,7 @@
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['with_complaints'] }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                            <i class="fas fa-check-circle fa-2x text-green-800"></i>
                         </div>
                     </div>
                 </div>
@@ -107,7 +107,7 @@
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['without_complaints'] }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-exclamation-circle fa-2x text-gray-300"></i>
+                            <i class="fas fa-exclamation-circle fa-2x text-yellow-800"></i>
                         </div>
                     </div>
                 </div>
@@ -123,7 +123,7 @@
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['total_complaints'] }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                            <i class="fas fa-clipboard-list fa-2x text-cyan-400"></i>
                         </div>
                     </div>
                 </div>
@@ -156,7 +156,7 @@
                                 <td><strong>{{ $category->name }}</strong></td>
                                 <td>{{ Str::limit($category->description ?? 'No description', 50) }}</td>
                                 <td>
-                                    <span class="badge badge-{{ $category->complaints_count > 0 ? 'success' : 'secondary' }}">
+                                    <span class="badge bg-{{ $category->complaints_count > 0 ? 'success' : 'secondary' }} text-white">
                                         {{ $category->complaints_count }}
                                     </span>
                                 </td>

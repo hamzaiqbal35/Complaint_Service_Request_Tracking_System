@@ -56,8 +56,18 @@ Route::middleware(['auth'])->group(function () {
             // User Management
             Route::prefix('users')->name('users.')->group(function () {
                 Route::get('export', [UserController::class, 'export'])->name('export');
-                Route::resource('', UserController::class);
-                Route::post('/users/{user}/verify-email', [UserController::class, 'verifyEmail'])->name('users.verify-email');
+                
+                // Define routes individually for better control
+                Route::get('', [UserController::class, 'index'])->name('index');
+                Route::get('create', [UserController::class, 'create'])->name('create');
+                Route::post('', [UserController::class, 'store'])->name('store');
+                Route::get('{user}/edit', [UserController::class, 'edit'])->name('edit');
+                Route::match(['put', 'patch'], '{user}', [UserController::class, 'update'])->name('update');
+                Route::delete('{user}', [UserController::class, 'destroy'])->name('destroy');
+                
+                // Keep the show route after other resource routes to avoid conflicts
+                Route::get('{user}', [UserController::class, 'show'])->name('show');
+                Route::post('{user}/verify-email', [UserController::class, 'verifyEmail'])->name('verify-email');
             });
             
             // Category Management

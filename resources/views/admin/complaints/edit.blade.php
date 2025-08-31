@@ -2,7 +2,7 @@
 
 @section('content')  <!-- Change from @section('admin') to @section('content') -->
 <div class="container mx-auto px-4">
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex justify-between items-center mb-6 mt-4">
         <h1 class="text-2xl font-bold text-gray-900">Manage Complaint #{{ $complaint->id }}</h1>
         <a href="{{ route('admin.complaints.index') }}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium">
             Back to List

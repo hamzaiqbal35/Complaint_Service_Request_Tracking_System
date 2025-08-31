@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -42,6 +43,22 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the complaints created by the user.
+     */
+    public function complaints(): HasMany
+    {
+        return $this->hasMany(Complaint::class, 'created_by');
+    }
+
+    /**
+     * Get the complaints assigned to the user (for staff).
+     */
+    public function assignedComplaints(): HasMany
+    {
+        return $this->hasMany(Complaint::class, 'assigned_to');
     }
 
     public function isAdmin(): bool { return $this->role === 'admin'; }

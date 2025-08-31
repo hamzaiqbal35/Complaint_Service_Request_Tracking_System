@@ -121,22 +121,37 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        // Prevent deleting the current admin user
-        if ($user->id === auth()->id()) {
-            return redirect()->route('admin.users.index')
-                ->with('error', 'You cannot delete your own account.');
+        try {
+            // Prevent deleting the currently authenticated user
+            if ($user->id === auth()->id()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You cannot delete your own account.'
+                ], 403);
+            }
+
+            // Check if user has any associated complaints
+            if ($user->complaints()->exists() || $user->assignedComplaints()->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot delete user with associated complaints.'
+                ], 422);
+            }
+
+            $user->delete();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'User deleted successfully.'
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Error deleting user: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while deleting the user.'
+            ], 500);
         }
-
-        // Check if user has complaints
-        if ($user->complaints()->exists() || $user->assignedComplaints()->exists()) {
-            return redirect()->route('admin.users.index')
-                ->with('error', 'Cannot delete user with associated complaints.');
-        }
-
-        $user->delete();
-
-        return redirect()->route('admin.users.index')
-            ->with('success', 'User deleted successfully.');
     }
 
     public function export(Request $request)
