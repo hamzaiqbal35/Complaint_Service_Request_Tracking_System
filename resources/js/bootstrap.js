@@ -1,4 +1,6 @@
-import 'bootstrap';
+// Bootstrap JS is loaded globally via CDN in resources/views/layouts/app.blade.php
+// Do not import it again via Vite to avoid duplicate event handlers (e.g., collapse flashing)
+// import 'bootstrap';
 
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests

@@ -128,9 +128,17 @@ class AdminDashboardController extends Controller
 
     public function export(Request $request)
     {
-        $complaints = Complaint::with(['category', 'creator', 'assignee'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        // Build the same base query used on the dashboard list
+        $complaintsQuery = Complaint::with(['category', 'creator', 'assignee']);
+
+        // Reuse the exact same filters
+        $this->applyFilters($complaintsQuery, $request);
+
+        // Respect current sorting
+        $sortBy = $request->input('sort_by', 'created_at');
+        $sortOrder = $request->input('sort_order', 'desc');
+
+        $complaints = $complaintsQuery->orderBy($sortBy, $sortOrder)->get();
 
         $csvFileName = 'complaints_' . date('Y-m-d_H-i-s') . '.csv';
         $headers = [

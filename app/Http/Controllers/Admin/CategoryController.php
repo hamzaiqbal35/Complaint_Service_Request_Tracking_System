@@ -22,9 +22,12 @@ class CategoryController extends Controller
             });
         }
 
-        // Apply sorting
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortOrder = $request->get('sort_order', 'desc');
+        // Apply sorting (whitelist columns)
+        $allowedSorts = ['created_at', 'name', 'complaints_count'];
+        $sortBy = in_array($request->get('sort_by', 'created_at'), $allowedSorts, true)
+            ? $request->get('sort_by', 'created_at')
+            : 'created_at';
+        $sortOrder = $request->get('sort_order', 'desc') === 'asc' ? 'asc' : 'desc';
         $query->orderBy($sortBy, $sortOrder);
 
         // Clone the query for statistics before pagination
@@ -125,6 +128,14 @@ class CategoryController extends Controller
                   ->orWhere('description', 'like', "%{$search}%");
             });
         }
+
+        // Apply same sorting as index
+        $allowedSorts = ['created_at', 'name', 'complaints_count'];
+        $sortBy = in_array($request->get('sort_by', 'created_at'), $allowedSorts, true)
+            ? $request->get('sort_by', 'created_at')
+            : 'created_at';
+        $sortOrder = $request->get('sort_order', 'desc') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($sortBy, $sortOrder);
 
         $categories = $query->get();
 

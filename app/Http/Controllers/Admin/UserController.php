@@ -36,9 +36,13 @@ class UserController extends Controller
             }
         }
 
-        // Apply sorting
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortOrder = $request->get('sort_order', 'desc');
+        // Apply sorting with whitelist (robust null/empty handling)
+        $allowedSorts = ['id', 'name', 'email', 'role', 'created_at'];
+        $requestedSortBy = $request->get('sort_by');
+        $sortBy = in_array($requestedSortBy, $allowedSorts, true) && !empty($requestedSortBy)
+            ? $requestedSortBy
+            : 'created_at';
+        $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
         $query->orderBy($sortBy, $sortOrder);
 
         $users = $query->paginate(15)->withQueryString();
@@ -170,6 +174,23 @@ class UserController extends Controller
                   ->orWhere('email', 'like', "%{$search}%");
             });
         }
+
+        if ($request->filled('status')) {
+            if ($request->status === 'active') {
+                $query->whereNull('email_verified_at');
+            } else {
+                $query->whereNotNull('email_verified_at');
+            }
+        }
+
+        // Apply sorting consistent with index (robust null/empty handling)
+        $allowedSorts = ['id', 'name', 'email', 'role', 'created_at'];
+        $requestedSortBy = $request->get('sort_by');
+        $sortBy = in_array($requestedSortBy, $allowedSorts, true) && !empty($requestedSortBy)
+            ? $requestedSortBy
+            : 'created_at';
+        $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($sortBy, $sortOrder);
 
         $users = $query->get();
 

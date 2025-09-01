@@ -1,10 +1,16 @@
 @extends('layouts.admin')
 
-@section('content')
+@section('admin')
+<style>[x-cloak]{display:none!important}</style>
 <div class="container-fluid">
+    <div x-data="{ open: true }">
     <div class="d-flex justify-content-between align-items-center mb-4 mt-4">
         <h1 class="h3 mb-0 text-gray-800">User Management</h1>
         <div class="d-flex gap-2">
+            <button id="filterToggleButton" class="btn btn-outline-primary" type="button"
+                    @click="open = !open" :aria-expanded="open.toString()" aria-controls="filterPanel">
+                <i class="fas fa-filter"></i> Filters
+            </button>
             <a href="{{ route('admin.users.export', request()->query()) }}" class="btn btn-success">
                 <i class="fas fa-download me-1"></i> Export Users
             </a>
@@ -28,8 +34,8 @@
         </div>
     @endif
 
-    <!-- Filter Section -->
-    <div class="collapse mb-4" id="filterCollapse">
+    <!-- Filter Section (Alpine.js) -->
+    <div id="filterPanel" class="mb-4" x-cloak x-show="open" x-transition>
         <div class="card">
             <div class="card-body">
                 <form method="GET" action="{{ route('admin.users.index') }}" class="row g-3">

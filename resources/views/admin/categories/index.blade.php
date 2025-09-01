@@ -1,14 +1,17 @@
 @extends('layouts.admin')
 
-@section('content')
+@section('admin')
+<style>[x-cloak]{display:none!important}</style>
 <div class="container-fluid">
+    <div x-data="{ open: true }">
     <div class="d-flex justify-content-between align-items-center mb-4 mt-4">
         <h1 class="h3 mb-0 text-gray-800">Category Management</h1>
         <div class="d-flex gap-2">
-            <button id="filterToggleButton" class="btn btn-outline-primary" type="button" aria-expanded="false" aria-controls="filterCollapse">
+            <button id="filterToggleButton" class="btn btn-outline-primary" type="button"
+                    @click="open = !open" :aria-expanded="open.toString()" aria-controls="filterPanel">
                 <i class="fas fa-filter"></i> Filters
             </button>
-            <a href="{{ route('admin.categories.export') }}" class="btn btn-success">
+            <a href="{{ route('admin.categories.export', request()->query()) }}" class="btn btn-success">
                 <i class="fas fa-file-export"></i> Export
             </a>
             <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">
@@ -31,8 +34,8 @@
         </div>
     @endif
 
-    <!-- Filter Section -->
-    <div class="collapse mb-4" id="filterCollapse">
+    <!-- Filter Section (Alpine.js) -->
+    <div id="filterPanel" class="mb-4" x-cloak x-show="open" x-transition>
         <div class="card">
             <div class="card-body">
                 <form method="GET" action="{{ route('admin.categories.index') }}" class="row g-3">
@@ -262,34 +265,20 @@
 function confirmDelete(categoryId, categoryName) {
     document.getElementById('deleteCategoryName').textContent = categoryName;
     document.getElementById('deleteForm').action = `/admin/categories/${categoryId}`;
-    
-    var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
     deleteModal.show();
 }
 
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (el) { return new bootstrap.Tooltip(el); });
 
     // Add animation to stat cards
     const statCards = document.querySelectorAll('.stat-card');
     statCards.forEach((card, index) => {
         card.style.animationDelay = `${index * 0.1}s`;
         card.classList.add('animate__animated', 'animate__fadeInUp');
-    });
-
-    // Manual control for filter collapse to prevent conflicts
-    const filterCollapseElement = document.getElementById('filterCollapse');
-    const filterCollapse = new bootstrap.Collapse(filterCollapseElement, {
-        toggle: false
-    });
-
-    const filterToggleButton = document.getElementById('filterToggleButton');
-    filterToggleButton.addEventListener('click', function () {
-        filterCollapse.toggle();
     });
 });
 </script>

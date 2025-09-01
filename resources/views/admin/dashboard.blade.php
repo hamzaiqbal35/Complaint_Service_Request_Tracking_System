@@ -317,7 +317,7 @@
         <div class="card-header py-3">
             <div class="mb-4 flex justify-between items-center">
                 <h2 class="h4 mb-0">Complaints List</h2>
-                <a href="{{ route('admin.dashboard.export') }}" 
+                <a href="{{ route('admin.dashboard.export', request()->query()) }}" 
                    class="btn btn-success d-inline-flex align-items-center">
                     <i class="fas fa-download me-2"></i>
                     Export
