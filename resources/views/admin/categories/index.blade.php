@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('content')
+@section('admin')
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4 mt-4">
         <h1 class="h3 mb-0 text-gray-800">Category Management</h1>
@@ -32,7 +32,7 @@
     @endif
 
     <!-- Filter Section -->
-    <div class="collapse mb-4" id="filterCollapse">
+    <div class="collapse mb-4 {{ request()->hasAny(['search', 'sort_by', 'sort_order']) ? 'show' : '' }}" id="filterCollapse">
         <div class="card">
             <div class="card-body">
                 <form method="GET" action="{{ route('admin.categories.index') }}" class="row g-3">
@@ -256,6 +256,59 @@
 .btn-group .btn {
     margin-right: 2px;
 }
+
+/* Filter section improvements */
+#filterCollapse {
+    transition: all 0.3s ease-in-out;
+    overflow: hidden;
+}
+
+#filterCollapse:not(.show) {
+    max-height: 0;
+    opacity: 0;
+    margin-bottom: 0 !important;
+}
+
+#filterCollapse.show {
+    max-height: 500px;
+    opacity: 1;
+    margin-bottom: 1.5rem !important;
+}
+
+/* Ensure filter button is always clickable */
+[data-bs-target="#filterCollapse"] {
+    position: relative;
+    z-index: 10;
+    cursor: pointer;
+}
+
+[data-bs-target="#filterCollapse"]:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+/* Prevent filter form from jumping */
+.collapse .card {
+    margin-bottom: 0;
+}
+
+/* Smooth transitions for better UX */
+.collapse {
+    transition: height 0.35s ease, opacity 0.35s ease;
+}
+
+.collapse:not(.show) {
+    opacity: 0;
+}
+
+.collapse.show {
+    opacity: 1;
+}
+
+/* Ensure proper spacing */
+.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
 </style>
 
 <script>
@@ -268,11 +321,61 @@ function confirmDelete(categoryId, categoryName) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Ensure Bootstrap is loaded
+    if (typeof bootstrap === 'undefined') {
+        console.error('Bootstrap JavaScript is not loaded');
+        return;
+    }
+
     // Initialize tooltips
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
+
+    // Handle filter collapse
+    const filterButton = document.querySelector('[data-bs-target="#filterCollapse"]');
+    const filterCollapse = document.getElementById('filterCollapse');
+    
+    if (filterButton && filterCollapse) {
+        // Initialize Bootstrap collapse
+        const bsCollapse = new bootstrap.Collapse(filterCollapse, {
+            toggle: false
+        });
+
+        // Handle button click
+        filterButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (filterCollapse.classList.contains('show')) {
+                bsCollapse.hide();
+                filterButton.setAttribute('aria-expanded', 'false');
+            } else {
+                bsCollapse.show();
+                filterButton.setAttribute('aria-expanded', 'true');
+            }
+        });
+
+        // Handle collapse events
+        filterCollapse.addEventListener('shown.bs.collapse', function () {
+            filterButton.setAttribute('aria-expanded', 'true');
+            localStorage.setItem('admin_categories_filter_open', 'true');
+        });
+
+        filterCollapse.addEventListener('hidden.bs.collapse', function () {
+            filterButton.setAttribute('aria-expanded', 'false');
+            localStorage.setItem('admin_categories_filter_open', 'false');
+        });
+
+        // Restore filter state from localStorage if no query parameters
+        const hasFilters = {{ request()->hasAny(['search', 'sort_by', 'sort_order']) ? 'true' : 'false' }};
+        if (!hasFilters && localStorage.getItem('admin_categories_filter_open') === 'true') {
+            setTimeout(() => {
+                bsCollapse.show();
+            }, 100);
+        }
+    }
 
     // Add animation to stat cards
     const statCards = document.querySelectorAll('.stat-card');
@@ -280,6 +383,37 @@ document.addEventListener('DOMContentLoaded', function() {
         card.style.animationDelay = `${index * 0.1}s`;
         card.classList.add('animate__animated', 'animate__fadeInUp');
     });
+
+    // Auto-submit form on select change (optional enhancement)
+    const sortSelects = document.querySelectorAll('#sort_by, #sort_order');
+    sortSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            // Optional: Auto-submit on change
+            // this.form.submit();
+        });
+    });
+});
+
+// Fallback for older browsers or if Bootstrap fails to load
+window.addEventListener('load', function() {
+    const filterButton = document.querySelector('[data-bs-target="#filterCollapse"]');
+    const filterCollapse = document.getElementById('filterCollapse');
+    
+    if (filterButton && filterCollapse && typeof bootstrap === 'undefined') {
+        console.warn('Bootstrap not available, using fallback filter toggle');
+        
+        filterButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            if (filterCollapse.style.display === 'none' || !filterCollapse.style.display) {
+                filterCollapse.style.display = 'block';
+                filterButton.setAttribute('aria-expanded', 'true');
+            } else {
+                filterCollapse.style.display = 'none';
+                filterButton.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
 });
 </script>
 @endsection

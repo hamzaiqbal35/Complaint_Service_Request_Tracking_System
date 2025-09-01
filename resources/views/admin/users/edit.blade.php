@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('content')
+@section('admin')
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4 mt-4">
         <h1 class="h3 mb-0 text-gray-800">Edit User</h1>

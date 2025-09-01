@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('content')
+@section('admin')
 <div class="container mx-auto px-4">
     <!-- Modified header section to remove arrow -->
     <div class="flex justify-between items-center mb-6 mt-4">

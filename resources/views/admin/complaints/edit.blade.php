@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('content')  <!-- Change from @section('admin') to @section('content') -->
+@section('admin')
 <div class="container mx-auto px-4">
     <div class="flex justify-between items-center mb-6 mt-4">
         <h1 class="text-2xl font-bold text-gray-900">Manage Complaint #{{ $complaint->id }}</h1>
