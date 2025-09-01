@@ -13,14 +13,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Temporary logout route for testing
-Route::get('/logout-get', function () {
-    Auth::logout();
-    request()->session()->invalidate();
-    request()->session()->regenerateToken();
-    return redirect('/')->with('success', 'Logged out successfully!');
-})->name('logout.get');
-
 // Landing page remains public
 
 // All application areas require authenticated AND verified users

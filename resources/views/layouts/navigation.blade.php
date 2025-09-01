@@ -100,13 +100,11 @@
                         @endif
 
                         <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}" id="logoutForm">
+                        <form method="POST" action="{{ route('logout') }}" class="w-full">
                             @csrf
-                            <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                document.getElementById('logoutForm').submit(); localStorage.removeItem('jwt_token');">
+                            <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                 {{ __('Log Out') }}
-                            </x-dropdown-link>
+                            </button>
                         </form>
                     </x-slot>
                 </x-dropdown>
@@ -184,19 +182,17 @@
                         {{ __('My Assignments') }}
                     </x-responsive-nav-link>
                 @elseif(auth()->user()->isAdmin())
-                    <x-responsive-nav-link :href="route('admin.complaints.index')">
+                    <x-dropdown-link :href="route('admin.complaints.index')">
                         {{ __('Manage Complaints') }}
-                    </x-responsive-nav-link>
+                    </x-dropdown-link>
                 @endif
 
                 <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}" id="logoutFormMobile">
+                <form method="POST" action="{{ route('logout') }}" class="w-full">
                     @csrf
-                    <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
-                                        document.getElementById('logoutFormMobile').submit(); localStorage.removeItem('jwt_token');">
+                    <button type="submit" class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         {{ __('Log Out') }}
-                    </x-responsive-nav-link>
+                    </button>
                 </form>
             </div>
         </div>

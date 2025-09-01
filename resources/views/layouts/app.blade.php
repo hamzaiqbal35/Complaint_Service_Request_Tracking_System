@@ -45,5 +45,43 @@
         
         <!-- Bootstrap JavaScript -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        
+        <!-- SweetAlert2 -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        
+        <script>
+            // Handle logout with confirmation
+            document.addEventListener('DOMContentLoaded', function() {
+                // Handle logout form submission
+                const logoutForms = document.querySelectorAll('form[action*="logout"]');
+                
+                logoutForms.forEach(form => {
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: 'You are about to log out of your account.',
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, log me out',
+                            cancelButtonText: 'Cancel',
+                            reverseButtons: true
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Remove JWT token from localStorage if it exists
+                                if (typeof localStorage !== 'undefined') {
+                                    localStorage.removeItem('jwt_token');
+                                }
+                                // Submit the form
+                                this.submit();
+                            }
+                        });
+                    });
+                });
+            });
+        </script>
     </body>
 </html>
