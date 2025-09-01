@@ -369,9 +369,19 @@
                     <ul class="navbar-nav ms-auto">
                         @auth
                             <li class="nav-item">
-                                <a class="nav-link fw-medium" href="{{ url('/dashboard') }}">
-                                    <i class="fas fa-tachometer-alt me-1"></i>Dashboard
-                                </a>
+                                @if(Auth::user() && Auth::user()->isAdmin())
+                                    <a class="nav-link fw-medium" href="{{ route('admin.dashboard') }}">
+                                        <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                                    </a>
+                                @elseif(Auth::user() && Auth::user()->isStaff())
+                                    <a class="nav-link fw-medium" href="{{ route('staff.dashboard') }}">
+                                        <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                                    </a>
+                                @else
+                                    <a class="nav-link fw-medium" href="{{ route('dashboard') }}">
+                                        <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                                    </a>
+                                @endif
                             </li>
                         @else
                             <li class="nav-item">
@@ -414,9 +424,19 @@
                         </p>
                         <div class="d-flex flex-column flex-sm-row gap-3">
                             @auth
-                                <a href="{{ url('/dashboard') }}" class="btn btn-light btn-lg btn-modern">
-                                    <i class="fas fa-rocket me-2"></i>Go to Dashboard
-                                </a>
+                                @if(Auth::user() && Auth::user()->isAdmin())
+                                    <a href="{{ route('admin.dashboard') }}" class="btn btn-light btn-lg btn-modern">
+                                        <i class="fas fa-rocket me-2"></i>Go to Dashboard
+                                    </a>
+                                @elseif(Auth::user() && Auth::user()->isStaff())
+                                    <a href="{{ route('staff.dashboard') }}" class="btn btn-light btn-lg btn-modern">
+                                        <i class="fas fa-rocket me-2"></i>Go to Dashboard
+                                    </a>
+                                @else
+                                    <a href="{{ route('dashboard') }}" class="btn btn-light btn-lg btn-modern">
+                                        <i class="fas fa-rocket me-2"></i>Go to Dashboard
+                                    </a>
+                                @endif
                             @else
                                 <a href="{{ route('register') }}" class="btn btn-light btn-lg btn-modern pulse-glow">
                                     <i class="fas fa-play me-2"></i>Get Started
@@ -543,9 +563,19 @@
                         </p>
                         <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
                             @auth
-                                <a href="{{ url('/dashboard') }}" class="btn btn-primary btn-lg btn-modern">
-                                    <i class="fas fa-rocket me-2"></i>Access Dashboard
-                                </a>
+                                @if(Auth::user() && Auth::user()->isAdmin())
+                                    <a href="{{ route('admin.dashboard') }}" class="btn btn-primary btn-lg btn-modern">
+                                        <i class="fas fa-rocket me-2"></i>Access Dashboard
+                                    </a>
+                                @elseif(Auth::user() && Auth::user()->isStaff())
+                                    <a href="{{ route('staff.dashboard') }}" class="btn btn-primary btn-lg btn-modern">
+                                        <i class="fas fa-rocket me-2"></i>Access Dashboard
+                                    </a>
+                                @else
+                                    <a href="{{ route('dashboard') }}" class="btn btn-primary btn-lg btn-modern">
+                                        <i class="fas fa-rocket me-2"></i>Access Dashboard
+                                    </a>
+                                @endif
                             @else
                                 <a href="{{ route('register') }}" class="btn btn-primary btn-lg btn-modern">
                                     <i class="fas fa-user-plus me-2"></i>Start Free Trial

@@ -32,15 +32,8 @@
                             <x-input-error :messages="$errors->get('email')" class="mt-2" />
                         </div>
 
-                        <!-- Role -->
-                        <div>
-                            <x-input-label for="role" :value="__('Register as')" class="text-gray-700" />
-                            <select id="role" name="role" class="block mt-1 w-full rounded-xl border-gray-300 focus:border-emerald-500 focus:ring-emerald-500" required>
-                                <option value="user" {{ old('role') === 'user' ? 'selected' : '' }}>User</option>
-                                <option value="staff" {{ old('role') === 'staff' ? 'selected' : '' }}>Staff</option>
-                            </select>
-                            <x-input-error :messages="$errors->get('role')" class="mt-2" />
-                        </div>
+                        <!-- Role (fixed to user) -->
+                        <input type="hidden" name="role" value="user">
 
                         <!-- Password -->
                         <div>
@@ -68,7 +61,7 @@
                 </div>
             </div>
 
-            <p class="text-center text-white/90 text-xs mt-4">Only Users & Staff can self-register</p>
+            <p class="text-center text-white/90 text-xs mt-4">Only Users can self-register</p>
         </div>
     </div>
 </x-guest-layout>

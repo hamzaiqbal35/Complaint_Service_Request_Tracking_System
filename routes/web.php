@@ -71,8 +71,10 @@ Route::middleware(['auth'])->group(function () {
             });
             
             // Category Management
+            // Define the custom export route BEFORE the resource route to avoid conflicts
+            Route::get('categories/export', [App\Http\Controllers\Admin\CategoryController::class, 'export'])
+                ->name('categories.export');
             Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
-            Route::get('categories/export', [App\Http\Controllers\Admin\CategoryController::class, 'export'])->name('categories.export');
         });
     });
 });
@@ -87,8 +89,6 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/admin/users/{user}/verify-email', [App\Http\Controllers\Admin\UserController::class, 'verifyEmail'])
         ->name('admin.users.verify-email');
-    Route::get('/admin/users/export', [UserController::class, 'export'])
-        ->name('admin.users.export');
 });
 
 require __DIR__.'/auth.php';

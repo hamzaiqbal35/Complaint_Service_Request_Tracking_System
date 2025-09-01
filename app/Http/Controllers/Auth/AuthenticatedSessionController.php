@@ -39,10 +39,10 @@ class AuthenticatedSessionController extends Controller
         }
 
         if ($user->isAdmin()) {
-            return redirect()->intended(route('admin.complaints.index', absolute: false));
+            return redirect()->intended(route('admin.dashboard', absolute: false));
         }
         if ($user->isStaff()) {
-            return redirect()->intended(route('staff.complaints.index', absolute: false));
+            return redirect()->intended(route('staff.dashboard', absolute: false));
         }
         return redirect()->intended(route('dashboard', absolute: false));
     }

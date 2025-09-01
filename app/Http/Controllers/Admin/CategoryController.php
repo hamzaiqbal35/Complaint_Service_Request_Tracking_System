@@ -27,14 +27,18 @@ class CategoryController extends Controller
         $sortOrder = $request->get('sort_order', 'desc');
         $query->orderBy($sortBy, $sortOrder);
 
+        // Clone the query for statistics before pagination
+        $statsQuery = clone $query;
+
         $categories = $query->paginate(15)->withQueryString();
 
-        // Get statistics
+        // Get statistics based on the filtered query
+        $filteredCategories = $statsQuery->get();
         $stats = [
-            'total' => Category::count(),
-            'with_complaints' => Category::has('complaints')->count(),
-            'without_complaints' => Category::doesntHave('complaints')->count(),
-            'total_complaints' => Category::withCount('complaints')->get()->sum('complaints_count'),
+            'total' => $filteredCategories->count(),
+            'with_complaints' => $filteredCategories->where('complaints_count', '>', 0)->count(),
+            'without_complaints' => $filteredCategories->where('complaints_count', '==', 0)->count(),
+            'total_complaints' => $filteredCategories->sum('complaints_count'),
         ];
 
         return view('admin.categories.index', compact('categories', 'stats'));

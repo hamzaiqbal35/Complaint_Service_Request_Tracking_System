@@ -5,11 +5,11 @@
     <div class="d-flex justify-content-between align-items-center mb-4 mt-4">
         <h1 class="h3 mb-0 text-gray-800">Category Management</h1>
         <div class="d-flex gap-2">
-            <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
+            <button id="filterToggleButton" class="btn btn-outline-primary" type="button" aria-expanded="false" aria-controls="filterCollapse">
                 <i class="fas fa-filter"></i> Filters
             </button>
-            <a href="{{ route('admin.categories.export', request()->query()) }}" class="btn btn-success">
-                <i class="fas fa-download"></i> Export
+            <a href="{{ route('admin.categories.export') }}" class="btn btn-success">
+                <i class="fas fa-file-export"></i> Export
             </a>
             <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Add Category
@@ -123,7 +123,7 @@
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['total_complaints'] }}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-clipboard-list fa-2x text-cyan-400"></i>
+                            <i class="fas fa-clipboard-list fa-2x text-blue-500"></i>
                         </div>
                     </div>
                 </div>
@@ -279,6 +279,17 @@ document.addEventListener('DOMContentLoaded', function() {
     statCards.forEach((card, index) => {
         card.style.animationDelay = `${index * 0.1}s`;
         card.classList.add('animate__animated', 'animate__fadeInUp');
+    });
+
+    // Manual control for filter collapse to prevent conflicts
+    const filterCollapseElement = document.getElementById('filterCollapse');
+    const filterCollapse = new bootstrap.Collapse(filterCollapseElement, {
+        toggle: false
+    });
+
+    const filterToggleButton = document.getElementById('filterToggleButton');
+    filterToggleButton.addEventListener('click', function () {
+        filterCollapse.toggle();
     });
 });
 </script>

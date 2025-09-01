@@ -316,7 +316,7 @@
                                                 </td>
                                                 <td class="align-middle">
                                                     <div class="btn-group" role="group">
-                                                        <a href="{{ route('complaints.show', $complaint) }}" 
+                                                        <a href="{{ route('staff.complaints.show', $complaint) }}" 
                                                            class="btn btn-sm btn-outline-primary" 
                                                            data-bs-toggle="tooltip" 
                                                            title="View Details">
