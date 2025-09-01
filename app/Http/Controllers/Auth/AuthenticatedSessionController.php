@@ -30,6 +30,12 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
         $user = $request->user();
 
+        // If the user has not verified their email, send them to the
+        // verification notice so they can self-verify before accessing the app.
+        if (! $user->hasVerifiedEmail()) {
+            return redirect()->route('verification.notice');
+        }
+
         // Create a JWT token for this authenticated user and store in session
         try {
             $token = JWTAuth::fromUser($user);

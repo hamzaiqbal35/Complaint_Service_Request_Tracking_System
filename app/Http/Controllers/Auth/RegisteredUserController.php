@@ -46,10 +46,7 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        if ($user->isStaff()) {
-            return redirect()->route('staff.complaints.index');
-        }
-
-        return redirect()->route('dashboard');
+        // Always prompt new users to verify their email first
+        return redirect()->route('verification.notice');
     }
 }
