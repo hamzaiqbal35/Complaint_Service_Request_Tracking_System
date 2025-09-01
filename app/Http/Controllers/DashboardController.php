@@ -35,9 +35,13 @@ class DashboardController extends Controller
             $query->whereDate('created_at', '<=', $request->date_to);
         }
 
-        // Apply sorting
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortOrder = $request->get('sort_order', 'desc');
+        // Apply sorting with whitelist and safe fallbacks
+        $allowedSorts = ['id', 'created_at', 'title', 'priority', 'status'];
+        $requestedSortBy = $request->get('sort_by');
+        $sortBy = in_array($requestedSortBy, $allowedSorts, true) && !empty($requestedSortBy)
+            ? $requestedSortBy
+            : 'created_at';
+        $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
         $query->orderBy($sortBy, $sortOrder);
 
         $complaints = $query->paginate(10)->withQueryString();
@@ -95,6 +99,15 @@ class DashboardController extends Controller
         if ($request->filled('date_to')) {
             $query->whereDate('created_at', '<=', $request->date_to);
         }
+
+        // Apply sorting consistent with index
+        $allowedSorts = ['id', 'created_at', 'title', 'priority', 'status'];
+        $requestedSortBy = $request->get('sort_by');
+        $sortBy = in_array($requestedSortBy, $allowedSorts, true) && !empty($requestedSortBy)
+            ? $requestedSortBy
+            : 'created_at';
+        $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($sortBy, $sortOrder);
 
         $complaints = $query->get();
 

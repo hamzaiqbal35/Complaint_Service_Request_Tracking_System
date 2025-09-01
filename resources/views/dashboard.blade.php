@@ -170,14 +170,14 @@
             <div class="row g-4 mb-4">
                 <div class="col-lg-8">
                     <!-- Complaints Table -->
-                    <div class="card border-0 shadow-sm">
+                    <div class="card border-0 shadow-sm" x-data="{ open: (new URLSearchParams(window.location.search)).toString().length > 0 }">
                         <div class="card-header bg-white border-0 py-3">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h5 class="fw-bold text-dark mb-0">
                                     <i class="fas fa-list me-2 text-primary"></i>My Complaints
                                 </h5>
                                 <div class="d-flex gap-2">
-                                    <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#filterCollapse">
+                                    <button class="btn btn-outline-secondary btn-sm" type="button" @click="open = !open" :aria-expanded="open.toString()" aria-controls="userFilterPanel">
                                         <i class="fas fa-filter me-1"></i>Filter
                                     </button>
                                     <a href="{{ route('dashboard.export', request()->query()) }}" class="btn btn-outline-secondary btn-sm">
@@ -188,7 +188,7 @@
                         </div>
                         
                         <!-- Filter Form -->
-                        <div class="collapse" id="filterCollapse">
+                        <div id="userFilterPanel" x-cloak x-show="open" x-transition>
                             <div class="card-body border-bottom">
                                 <form method="GET" action="{{ route('dashboard') }}" class="row g-3">
                                     <div class="col-md-3">
@@ -609,6 +609,8 @@
                 font-size: 0.875rem;
             }
         }
+        
+        [x-cloak] { display: none !important; }
     </style>
 
     <script>

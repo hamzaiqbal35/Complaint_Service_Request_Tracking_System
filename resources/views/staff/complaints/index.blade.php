@@ -14,14 +14,14 @@
 
     <div class="py-4">
         <div class="container-fluid">
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-sm" x-data="{ open: true }">
                 <div class="card-header bg-white border-0 py-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="fw-bold text-dark mb-0">
                             <i class="fas fa-list me-2 text-primary"></i>Assigned Complaints
                         </h5>
                         <div class="d-flex gap-2">
-                            <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#staffComplaintsFilter">
+                            <button class="btn btn-outline-secondary btn-sm" type="button" @click="open = !open" :aria-expanded="open.toString()" aria-controls="staffComplaintsFilterPanel">
                                 <i class="fas fa-filter me-1"></i>Filter
                             </button>
                         </div>
@@ -29,7 +29,7 @@
                 </div>
                 
                 <!-- Filter Form -->
-                <div class="collapse" id="staffComplaintsFilter">
+                <div id="staffComplaintsFilterPanel" x-cloak x-show="open" x-transition>
                     <div class="card-body border-bottom">
                         <form method="GET" action="{{ route('staff.complaints.index') }}" class="row g-3">
                             <div class="col-md-3">
@@ -91,7 +91,7 @@
                                     <button type="submit" class="btn btn-primary flex-fill">
                                         <i class="fas fa-search me-1"></i>Apply Filters
                                     </button>
-                                    <a href="{{ route('staff.complaints.index') }}" class="btn btn-outline-secondary">
+                                    <a href="{{ route('staff.complaints.index') }}" class="btn btn-outline-secondary" title="Clear filters">
                                         <i class="fas fa-times"></i>
                                     </a>
                                 </div>
@@ -256,6 +256,7 @@
     @endforeach
 
     <style>
+        [x-cloak]{display:none!important}
         .bg-gradient-primary { background: linear-gradient(135deg, #0d9488 0%, #059669 100%); }
         .complaint-row { transition: all 0.2s ease; }
         .complaint-row:hover { background-color: rgba(13, 148, 136, 0.05); }
