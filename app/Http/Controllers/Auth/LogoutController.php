@@ -14,31 +14,30 @@ class LogoutController extends Controller
         try {
             $user = $request->user();
             
-            Auth::logout();
+            // Revoke the current user's token
+            $user->currentAccessToken()->delete();
             
+            // Clear the session
             $request->session()->invalidate();
             $request->session()->regenerateToken();
             
-            Log::info('User logged out successfully', [
-                'user_id' => $user ? $user->id : null,
-                'ip' => $request->ip(),
-                'user_agent' => $request->userAgent()
-            ]);
+            // Clear any existing tokens
+            $user->tokens()->delete();
             
-            return redirect('/');
-        } catch (\Exception $e) {
-            Log::error('Logout failed', [
-                'error' => $e->getMessage(),
-                'user_id' => $request->user() ? $request->user()->id : null,
-                'ip' => $request->ip(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            
-            // Still log the user out even if logging fails
+            // Clear the authentication state
             Auth::logout();
-            $request->session()->invalidate();
             
-            return redirect('/')->with('error', 'An error occurred during logout. You have been logged out for security.');
+            // Redirect to login page
+            return redirect('/login')
+                ->with('status', 'You have been successfully logged out!');
+                
+        } catch (\Exception $e) {
+            // Log the error
+            \Log::error('Logout error: ' . $e->getMessage());
+            
+            // Still redirect to login even if there was an error
+            return redirect('/login')
+                ->with('error', 'There was an error during logout. Please try again.');
         }
     }
 }

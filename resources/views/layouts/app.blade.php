@@ -5,6 +5,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
+        <!-- Cache Control -->
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />
+
         <title>{{ config('app.name', 'Laravel') }}</title>
 
         <!-- Fonts -->
@@ -109,6 +114,35 @@
                     });
                 });
             });
+        </script>
+
+        <script>
+            // Clear any existing session storage
+            sessionStorage.clear();
+            
+            // Only run this for authenticated users
+            @if(auth()->check())
+            // Store current URL in session storage
+            sessionStorage.setItem('validSession', '1');
+            
+            // Prevent back button after logout
+            window.history.pushState(null, null, window.location.href);
+            window.onpopstate = function() {
+                // If session is no longer valid, redirect to login
+                if (!sessionStorage.getItem('validSession')) {
+                    window.location.href = '{{ route("login") }}';
+                }
+                window.history.pushState(null, null, window.location.href);
+            };
+            
+            // Clear session flag on page unload
+            window.addEventListener('beforeunload', function() {
+                // Don't clear if this is a form submission or link click
+                if (!event.target.href && !event.target.form) {
+                    sessionStorage.removeItem('validSession');
+                }
+            });
+            @endif
         </script>
     </body>
 </html>
