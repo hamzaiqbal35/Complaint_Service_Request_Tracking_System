@@ -1,113 +1,108 @@
 # Complaint & Service Request Tracking System
 
-A comprehensive Laravel-based complaint management system with JWT authentication and role-based access control.
+A comprehensive Laravel-based complaint management system with authentication and role-based access control, featuring a modern UI with animated interfaces.
 
 ## 🚀 Features
 
+### Authentication & Security
 - **JWT Authentication**: Secure token-based authentication with local storage
-- **Role-Based Access**: Three user roles (User, Staff, Admin)
-- **Modern UI**: Bootstrap 5 with custom styling and animations
-- **Real-time Updates**: Live complaint status tracking
-- **Password Reset**: Complete forgot password functionality
-- **Responsive Design**: Works on all devices
-
-## 🏗️ System Architecture
+- **Role-Based Access Control**: Three distinct user roles with granular permissions
+- **Password Management**: Secure password reset functionality
+- **Session Management**: Secure session handling with configurable lifetime
 
 ### User Roles & Access
 
 1. **Users** (`/dashboard`)
-   - Submit new complaints
-   - View their own complaints
-   - Track complaint status
-   - Update profile
+   - Submit and track complaints
+   - View complaint history and status
+   - Update personal profile
+   - Receive email notifications
 
-2. **Staff** (`/staff/complaints`)
-   - View assigned complaints
+2. **Staff** (`/staff/dashboard`)
+   - View and manage assigned complaints
    - Update complaint status
-   - Add notes to complaints
-   - Manage their workload
+   - Add internal notes and comments
+   - View performance metrics
 
-3. **Admin** (`/admin/complaints`)
-   - View all complaints
-   - Assign complaints to staff
-   - Update complaint status
-   - System-wide statistics
-   - User management
+3. **Administrators** (`/admin/dashboard`)
+   - Manage all system users
+   - Handle categories and departments
+   - View system analytics and reports
+   - Configure system settings
 
-## 🔐 Authentication System
+### Core Functionality
+- **Complaint Management**: Full CRUD operations for complaints
+- **Real-time Updates**: Live status tracking and notifications
+- **File Attachments**: Support for complaint-related documents and images
+- **Search & Filters**: Advanced search with multiple filter options
+- **Activity Logs**: Comprehensive audit trail of all actions
 
-### JWT Token Management
+## 🎨 UI/UX Features
+- Modern, responsive design with Bootstrap 5
+- Animated interfaces with smooth transitions
+- Mobile-first approach for all devices
+- Accessibility compliant (WCAG 2.1)
+- Custom theming with dark/light mode support
 
-- **Login**: `/jwt/login` - Modern login interface with role selection
-- **Token Storage**: JWT tokens stored in localStorage
-- **Session Management**: Separate sessions for each role
-- **Logout**: Automatic token invalidation and cleanup
+## 🛠️ Tech Stack
+- **Backend**: PHP 8.1+, Laravel 10.x
+- **Frontend**: HTML5, CSS3, JavaScript, Bootstrap 5
+- **Database**: MySQL 8.0+
+- **Authentication**: JWT (tymon/jwt-auth)
+- **Deployment**: Compatible with shared hosting (e.g., InfinityFree)
 
-### Password Reset Flow
-
-1. **Forgot Password**: `/jwt/forgot-password`
-2. **Reset Link**: Email with secure reset token
-3. **Reset Password**: `/jwt/reset-password/{token}`
-
-## 🎨 UI Improvements
-
-### Dashboard Features
-
-- **Horizontal Card Layout**: Statistics cards in modern horizontal design
-- **Real-time Statistics**: Live complaint counts and percentages
-- **Quick Actions**: Easy access to common tasks
-- **Recent Activity**: Timeline of recent complaints
-- **Responsive Design**: Mobile-friendly interface
-
-### Modern Styling
-
-- **Gradient Backgrounds**: Beautiful gradient designs
-- **Card Animations**: Hover effects and smooth transitions
-- **Icon Integration**: Font Awesome icons throughout
-- **Color-coded Status**: Visual status indicators
-- **Loading States**: Professional loading animations
-
-## 🛠️ Installation & Setup
+## � Getting Started
 
 ### Prerequisites
-
-- PHP 8.2+
+- PHP 8.1 or higher
 - Composer
 - Node.js & NPM
-- SQLite (or MySQL/PostgreSQL)
+- MySQL 8.0 or higher
+- Web server (Apache/Nginx)
 
-### Installation Steps
+### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/hamzaiqbal35/Complaint_Service_Request_Tracking_System.git
    cd Complaint_Service_Request_Tracking_System
    ```
 
-2. **Install dependencies**
+2. **Install PHP dependencies**
    ```bash
    composer install
+   ```
+
+3. **Install NPM dependencies**
+   ```bash
    npm install
-   ```
-
-3. **Environment setup**
-   ```bash
-   cp .env.example .env
-   php artisan key:generate
-   php artisan jwt:secret
-   ```
-
-4. **Database setup**
-   ```bash
-   php artisan migrate:fresh --seed
-   ```
-
-5. **Build assets**
-   ```bash
+   npm run build
    npm run dev
    ```
 
-6. **Start the server**
+4. **Environment setup**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+5. **Configure database**
+   Update `.env` with your database credentials:
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=your_database
+   DB_USERNAME=your_username
+   DB_PASSWORD=your_password
+   ```
+
+6. **Run migrations and seeders**
+   ```bash
+   php artisan migrate --seed
+   ```
+
+7. **Start the development server**
    ```bash
    php artisan serve
    ```
@@ -131,80 +126,17 @@ After seeding, you can login with these credentials:
 - **Password**: password
 - **Role**: User
 
-## 🚪 How to Access Different Panels
-
-### 1. JWT Login System
-
-Visit `/jwt/login` to access the new JWT authentication system.
-
-### 2. Role-Based Access
-
-#### For Users:
-- **Dashboard**: `/dashboard`
-- **My Complaints**: `/complaints`
-- **New Complaint**: `/complaints/create`
-
-#### For Staff:
-- **Assigned Complaints**: `/staff/complaints`
-- **Update Status**: Available in complaint details
-
-#### For Admin:
-- **All Complaints**: `/admin/complaints`
-- **Manage Complaints**: `/admin/complaints/{id}/edit`
-- **System Statistics**: Available on admin dashboard
-
-### 3. Navigation
-
-The navigation bar automatically shows relevant links based on your role:
-- **Users**: Dashboard, My Complaints, New Complaint
-- **Staff**: Assigned Complaints, My Assignments
-- **Admin**: All Complaints, Manage Complaints
-
-## 🔧 API Endpoints
-
-### Authentication
-- `POST /api/login` - JWT login
-- `POST /api/register` - User registration
-- `POST /api/logout` - JWT logout
-- `POST /api/refresh` - Token refresh
-- `GET /api/me` - Get current user
-
-### Password Reset
-- `POST /api/forgot-password` - Send reset link
-- `POST /api/reset-password` - Reset password
-
-### Complaints
-- `GET /api/complaints` - List complaints (role-based)
-- `GET /api/complaints/{id}` - Get complaint details
 
 ## 🎯 Key Features Explained
 
-### 1. JWT Authentication Flow
-
-```javascript
-// Login process
-1. User submits credentials
-2. Server validates and returns JWT token
-3. Token stored in localStorage
-4. Token used for subsequent requests
-5. Automatic role-based redirect
-```
-
-### 2. Separate Sessions
-
-- Each role has its own session
-- Tokens are role-specific
-- Logout clears all session data
-- Automatic token refresh
-
-### 3. Dashboard Improvements
+### 1. Dashboard Improvements
 
 - **Horizontal Layout**: Cards arranged horizontally for better space usage
 - **Real-time Stats**: Live complaint statistics
 - **Quick Actions**: Easy access to common tasks
 - **Modern UI**: Bootstrap 5 with custom styling
 
-### 4. Password Reset System
+### 2. Password Reset System
 
 - **Secure Tokens**: Time-limited reset tokens
 - **Email Integration**: Automatic email sending
@@ -251,36 +183,33 @@ php artisan test --filter TestName
 
 ### Common Issues
 
-1. **JWT Token Issues**
-   - Clear localStorage
-   - Check token expiration
-   - Verify JWT secret
-
-2. **Database Issues**
+1. **Database Issues**
    - Run migrations: `php artisan migrate:fresh --seed`
    - Check database connection
    - Verify .env configuration
 
-3. **Asset Issues**
+2. **Asset Issues**
    - Run: `npm run dev`
    - Clear cache: `php artisan cache:clear`
    - Check Vite configuration
 
-## 📞 Support
+## 📝 License
+This project is open-source and available under the [MIT License](LICENSE).
 
-For issues or questions:
-1. Check the troubleshooting section
-2. Review the logs in `storage/logs/`
-3. Verify your environment setup
-4. Check Laravel documentation
+## 📧 Contact
+For support, email [hamzaiqbalrajpoot35@gmail.com](mailto:hamzaiqbalrajpoot35@gmail.com)
 
 ## 🎉 Conclusion
 
 This system provides a complete, modern complaint management solution with:
-- Secure JWT authentication
 - Role-based access control
 - Modern, responsive UI
-- Complete password reset functionality
 - Real-time statistics and tracking
 
-The dashboard has been completely redesigned with horizontal card layouts, modern styling, and improved user experience across all devices.
+The dashboard has been completely designed with horizontal card layouts, modern styling, and improved user experience across all devices.
+
+---
+
+<div align="center">
+  Made with using Laravel, MySQL, Tailwind CSS & Bootstrap
+</div>
