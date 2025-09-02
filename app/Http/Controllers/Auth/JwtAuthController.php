@@ -40,22 +40,21 @@ class JwtAuthController extends Controller
             ], 500);
         }
 
+        // Get the authenticated user
         $user = Auth::user();
         
+        // Return the token in the response body
         return response()->json([
             'status' => 'success',
             'message' => 'Login successful',
+            'token' => $token, // Ensure token is at the root level
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
                 'role' => $user->role,
-            ],
-            'authorization' => [
-                'token' => $token,
-                'type' => 'bearer',
             ]
-        ]);
+        ])->header('Authorization', 'Bearer ' . $token); // Also set in header for convenience
     }
 
     public function register(Request $request)
@@ -93,11 +92,20 @@ class JwtAuthController extends Controller
 
     public function logout()
     {
-        Auth::logout();
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Successfully logged out',
-        ]);
+        try {
+            // Invalidate the current token
+            auth()->logout(true); // Pass true to force the token to be blacklisted
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Successfully logged out',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to logout',
+            ], 500);
+        }
     }
 
     public function refresh()

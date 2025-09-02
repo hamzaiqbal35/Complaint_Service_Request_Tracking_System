@@ -18,11 +18,41 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
         <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @vite([
+            'resources/css/app.css',
+            'resources/js/app.js',
+            'resources/js/auth.js',
+            'resources/js/auth-handler.js'
+        ])
+        
+        <!-- SweetAlert2 -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        
+        @stack('scripts')
+        
+        <style>
+            .sticky-nav {
+                position: sticky;
+                top: 0;
+                z-index: 1030; /* Bootstrap's default z-index for fixed navbars */
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                background-color: #fff; /* Or your preferred background color */
+            }
+            body {
+                padding-top: 0px; /* Height of the navbar */
+            }
+            @media (min-width: 992px) {
+                body {
+                    padding-top: 15px; /* Adjust if your navbar height is different on desktop */
+                }
+            }
+        </style>
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">
-            @include('layouts.navigation')
+            <div class="sticky-nav">
+                @include('layouts.navigation')
+            </div>
 
             <!-- Page Heading -->
             @isset($header)
@@ -45,9 +75,6 @@
         
         <!-- Bootstrap JavaScript -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        
-        <!-- SweetAlert2 -->
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         
         <script>
             // Handle logout with confirmation

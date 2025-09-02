@@ -6,7 +6,9 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/app.css',
-                'resources/js/app.js'
+                'resources/js/app.js',
+                'resources/js/auth.js',
+                'resources/js/auth-handler.js'
             ],
             refresh: true,
         }),
@@ -18,9 +20,13 @@ export default defineConfig({
             host: '127.0.0.1',
         },
     },
-    resolve: {
-        alias: {
-            '~bootstrap': 'node_modules/bootstrap',
+    build: {
+        rollupOptions: {
+            output: {
+                entryFileNames: 'assets/[name].js',
+                chunkFileNames: 'assets/[name].js',
+                assetFileNames: 'assets/[name].[ext]'
+            }
         }
     }
 });

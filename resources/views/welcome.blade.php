@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>Complaint & Service Request Tracking System</title>
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
@@ -360,45 +361,6 @@
                     </div>
                     <span class="gradient-text fw-bold fs-4">Complaint Service Request Tracking System</span>
                 </a>
-
-                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        @auth
-                            <li class="nav-item">
-                                @if(Auth::user() && Auth::user()->isAdmin())
-                                    <a class="nav-link fw-medium" href="{{ route('admin.dashboard') }}">
-                                        <i class="fas fa-tachometer-alt me-1"></i>Dashboard
-                                    </a>
-                                @elseif(Auth::user() && Auth::user()->isStaff())
-                                    <a class="nav-link fw-medium" href="{{ route('staff.dashboard') }}">
-                                        <i class="fas fa-tachometer-alt me-1"></i>Dashboard
-                                    </a>
-                                @else
-                                    <a class="nav-link fw-medium" href="{{ route('dashboard') }}">
-                                        <i class="fas fa-tachometer-alt me-1"></i>Dashboard
-                                    </a>
-                                @endif
-                            </li>
-                        @else
-                            <li class="nav-item">
-                                <a class="nav-link fw-medium" href="{{ route('login') }}">
-                                    <i class="fas fa-sign-in-alt me-1"></i>Log in
-                                </a>
-                            </li>
-                            @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a class="btn btn-primary btn-modern ms-2" href="{{ route('register') }}">
-                                        <i class="fas fa-user-plus me-1"></i>Register
-                                    </a>
-                                </li>
-                            @endif
-                        @endauth
-                    </ul>
-                </div>
             </div>
         </nav>
 

@@ -50,14 +50,32 @@
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                                @if($complaint->status === 'pending') bg-gray-100 text-gray-800
-                                                @elseif($complaint->status === 'in_progress') bg-blue-100 text-blue-800
-                                                @elseif($complaint->status === 'resolved') bg-green-100 text-green-800
-                                                @else bg-red-100 text-red-800
-                                                @endif">
-                                                {{ ucfirst(str_replace('_', ' ', $complaint->status)) }}
-                                            </span>
+                                            @switch($complaint->status)
+                                                @case('pending')
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                        Pending
+                                                    </span>
+                                                    @break
+                                                @case('in_progress')
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                        In Progress
+                                                    </span>
+                                                    @break
+                                                @case('resolved')
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                        Resolved
+                                                    </span>
+                                                    @break
+                                                @case('rejected')
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                        Rejected
+                                                    </span>
+                                                    @break
+                                                @default
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                        {{ $complaint->status }}
+                                                    </span>
+                                            @endswitch
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {{ $complaint->assignee ? $complaint->assignee->name : 'Not Assigned' }}

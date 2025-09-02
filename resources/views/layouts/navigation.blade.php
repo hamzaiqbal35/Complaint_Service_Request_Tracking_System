@@ -1,6 +1,6 @@
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
     <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto px-0 sm:px-0 lg:px-0">
         <div class="flex justify-between h-16">
             <div class="flex">
                 <!-- Logo -->
@@ -102,7 +102,7 @@
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}" class="w-full">
                             @csrf
-                            <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <button type="button" onclick="handleLogout()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                 {{ __('Log Out') }}
                             </button>
                         </form>
@@ -190,7 +190,7 @@
                 <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}" class="w-full">
                     @csrf
-                    <button type="submit" class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    <button type="button" onclick="handleLogout()" class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         {{ __('Log Out') }}
                     </button>
                 </form>

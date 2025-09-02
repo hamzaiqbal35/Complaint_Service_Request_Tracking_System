@@ -18,41 +18,45 @@
                     <!-- Session Status -->
                     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-                    <form method="POST" action="{{ route('login') }}" class="space-y-5">
+                    <form id="login-form" method="POST" action="{{ route('login') }}" class="space-y-6">
                         @csrf
 
-                        <!-- Email Address -->
+                        <!-- Email -->
                         <div>
-                            <x-input-label for="email" :value="__('Email address')" class="text-gray-700" />
-                            <x-text-input id="email" class="block mt-1 w-full rounded-xl border-gray-300 focus:border-emerald-500 focus:ring-emerald-500" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
+                            <x-input-label for="email" :value="__('Email')" />
+                            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
                             <x-input-error :messages="$errors->get('email')" class="mt-2" />
                         </div>
 
                         <!-- Password -->
-                        <div>
-                            <div class="flex items-center justify-between">
-                                <x-input-label for="password" :value="__('Password')" class="text-gray-700" />
-                                @if (Route::has('password.request'))
-                                    <a href="{{ route('password.request') }}" class="text-sm text-emerald-600 hover:text-emerald-700 font-medium">Forgot?</a>
-                                @endif
-                            </div>
-
-                            <x-text-input id="password" class="block mt-1 w-full rounded-xl border-gray-300 focus:border-emerald-500 focus:ring-emerald-500" type="password" name="password" required autocomplete="current-password" />
+                        <div class="mt-4">
+                            <x-input-label for="password" :value="__('Password')" />
+                            <x-text-input id="password" class="block mt-1 w-full"
+                                            type="password"
+                                            name="password"
+                                            required autocomplete="current-password" />
                             <x-input-error :messages="$errors->get('password')" class="mt-2" />
                         </div>
 
                         <!-- Remember Me -->
-                        <div class="flex items-center justify-between">
-                            <label for="remember_me" class="inline-flex items-center">
-                                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-emerald-600 shadow-sm focus:ring-emerald-500" name="remember">
+                        <div class="block mt-4">
+                            <label for="remember" class="inline-flex items-center">
+                                <input id="remember" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
                                 <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
                             </label>
-                            <a href="{{ route('register') }}" class="text-sm text-gray-500 hover:text-gray-700">Create account</a>
                         </div>
 
-                        <x-primary-button class="w-full justify-center bg-emerald-600 hover:bg-emerald-700 focus:bg-emerald-700 active:bg-emerald-800 border-0 rounded-xl py-3 text-base font-semibold">
-                            {{ __('Sign in') }}
-                        </x-primary-button>
+                        <div class="flex items-center justify-between mt-4">
+                            @if (Route::has('password.request'))
+                                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
+                                    {{ __('Forgot your password?') }}
+                                </a>
+                            @endif
+
+                            <x-primary-button type="submit" class="ms-3">
+                                {{ __('Log in') }}
+                            </x-primary-button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -68,4 +72,75 @@
             } catch (e) {}
         </script>
     @endif
+
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const form = document.getElementById('login-form');
+                
+                if (form) {
+                    form.addEventListener('submit', async function(e) {
+                        e.preventDefault();
+                        
+                        const submitButton = form.querySelector('button[type="submit"]');
+                        const originalButtonText = submitButton.innerHTML;
+                        
+                        try {
+                            // Show loading state
+                            submitButton.disabled = true;
+                            submitButton.innerHTML = 'Signing in...';
+                            
+                            const formData = new FormData(form);
+                            const response = await window.axios.post(form.action, {
+                                email: formData.get('email'),
+                                password: formData.get('password'),
+                                remember: formData.get('remember')
+                            });
+                            
+                            // Store the token
+                            if (response.data.token) {
+                                if (window.auth && typeof window.auth.setToken === 'function') {
+                                    window.auth.setToken(response.data.token);
+                                    
+                                    // Redirect based on response or default
+                                    const redirectTo = response.data.redirect_to || '/dashboard';
+                                    window.location.href = redirectTo;
+                                } else {
+                                    console.error('Auth module not loaded');
+                                    alert('Authentication error. Please refresh the page and try again.');
+                                }
+                            }
+                        } catch (error) {
+                            console.error('Login error:', error);
+                            let errorMessage = 'An error occurred during login';
+                            
+                            if (error.response) {
+                                if (error.response.data.message) {
+                                    errorMessage = error.response.data.message;
+                                } else if (error.response.status === 422) {
+                                    errorMessage = 'Invalid email or password';
+                                }
+                            }
+                            
+                            // Show error message
+                            if (window.Swal) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Login Failed',
+                                    text: errorMessage,
+                                    confirmButtonColor: '#3085d6',
+                                });
+                            } else {
+                                alert(errorMessage);
+                            }
+                        } finally {
+                            // Reset button state
+                            submitButton.disabled = false;
+                            submitButton.innerHTML = originalButtonText;
+                        }
+                    });
+                }
+            });
+        </script>
+    @endpush
 </x-guest-layout>

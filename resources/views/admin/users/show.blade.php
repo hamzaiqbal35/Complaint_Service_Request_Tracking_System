@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4 mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
         <h1 class="h3 mb-0 text-gray-800">User Details</h1>
         <div class="d-flex gap-2">
             <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-primary">
