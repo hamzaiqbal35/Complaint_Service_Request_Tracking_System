@@ -41,7 +41,7 @@
                 <form method="GET" action="{{ route('admin.users.index') }}" class="row g-3">
                     <div class="col-md-3">
                         <label for="role" class="form-label">Role</label>
-                        <select name="role" id="role" class="form-select">
+                        <select name="role" id="role" class="form-select rounded-3">
                             <option value="">All Roles</option>
                             <option value="user" {{ request('role') == 'user' ? 'selected' : '' }}>User</option>
                             <option value="staff" {{ request('role') == 'staff' ? 'selected' : '' }}>Staff</option>
@@ -50,11 +50,11 @@
                     </div>
                     <div class="col-md-3">
                         <label for="search" class="form-label">Search</label>
-                        <input type="text" name="search" id="search" class="form-control" placeholder="Name or Email" value="{{ request('search') }}">
+                        <input type="text" name="search" id="search" class="form-control rounded-3" placeholder="Name or Email" value="{{ request('search') }}">
                     </div>
                     <div class="col-md-2">
                         <label for="sort_by" class="form-label">Sort By</label>
-                        <select name="sort_by" id="sort_by" class="form-select">
+                        <select name="sort_by" id="sort_by" class="form-select rounded-3">
                             <option value="created_at" {{ request('sort_by') == 'created_at' ? 'selected' : '' }}>Created Date</option>
                             <option value="name" {{ request('sort_by') == 'name' ? 'selected' : '' }}>Name</option>
                             <option value="email" {{ request('sort_by') == 'email' ? 'selected' : '' }}>Email</option>
@@ -63,7 +63,7 @@
                     </div>
                     <div class="col-md-2">
                         <label for="sort_order" class="form-label">Sort Order</label>
-                        <select name="sort_order" id="sort_order" class="form-select">
+                        <select name="sort_order" id="sort_order" class="form-select rounded-3">
                             <option value="desc" {{ request('sort_order') == 'desc' ? 'selected' : '' }}>Descending</option>
                             <option value="asc" {{ request('sort_order') == 'asc' ? 'selected' : '' }}>Ascending</option>
                         </select>

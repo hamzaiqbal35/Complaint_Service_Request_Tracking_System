@@ -53,12 +53,12 @@
                         </div>
                         <div class="col-md-2">
                             <label for="date_from" class="form-label">From Date</label>
-                            <input type="date" name="date_from" id="date_from" class="form-control" 
+                            <input type="date" name="date_from" id="date_from" class="form-control rounded-3" 
                                    value="{{ request('date_from') }}">
                         </div>
                         <div class="col-md-2">
                             <label for="date_to" class="form-label">To Date</label>
-                            <input type="date" name="date_to" id="date_to" class="form-control" 
+                            <input type="date" name="date_to" id="date_to" class="form-control rounded-3" 
                                    value="{{ request('date_to') }}">
                         </div>
                         <div class="col-md-2">

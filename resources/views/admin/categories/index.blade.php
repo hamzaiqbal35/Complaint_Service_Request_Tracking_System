@@ -41,11 +41,11 @@
                 <form method="GET" action="{{ route('admin.categories.index') }}" class="row g-3">
                     <div class="col-md-4">
                         <label for="search" class="form-label">Search</label>
-                        <input type="text" name="search" id="search" class="form-control" placeholder="Name or Description" value="{{ request('search') }}">
+                        <input type="text" name="search" id="search" class="form-control rounded-3" placeholder="Name or Description" value="{{ request('search') }}">
                     </div>
                     <div class="col-md-3">
                         <label for="sort_by" class="form-label">Sort By</label>
-                        <select name="sort_by" id="sort_by" class="form-select">
+                        <select name="sort_by" id="sort_by" class="form-select rounded-3">
                             <option value="created_at" {{ request('sort_by') == 'created_at' ? 'selected' : '' }}>Created Date</option>
                             <option value="name" {{ request('sort_by') == 'name' ? 'selected' : '' }}>Name</option>
                             <option value="complaints_count" {{ request('sort_by') == 'complaints_count' ? 'selected' : '' }}>Complaints Count</option>
@@ -53,7 +53,7 @@
                     </div>
                     <div class="col-md-3">
                         <label for="sort_order" class="form-label">Sort Order</label>
-                        <select name="sort_order" id="sort_order" class="form-select">
+                        <select name="sort_order" id="sort_order" class="form-select rounded-3">
                             <option value="desc" {{ request('sort_order') == 'desc' ? 'selected' : '' }}>Descending</option>
                             <option value="asc" {{ request('sort_order') == 'asc' ? 'selected' : '' }}>Ascending</option>
                         </select>

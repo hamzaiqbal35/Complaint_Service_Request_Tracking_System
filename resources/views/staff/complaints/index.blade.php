@@ -34,7 +34,7 @@
                         <form method="GET" action="{{ route('staff.complaints.index') }}" class="row g-3">
                             <div class="col-md-3">
                                 <label for="status" class="form-label">Status</label>
-                                <select name="status" id="status" class="form-select">
+                                <select name="status" id="status" class="form-select rounded-3">
                                     <option value="">All Statuses</option>
                                     <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
                                     <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
@@ -44,7 +44,7 @@
                             </div>
                             <div class="col-md-3">
                                 <label for="priority" class="form-label">Priority</label>
-                                <select name="priority" id="priority" class="form-select">
+                                <select name="priority" id="priority" class="form-select rounded-3">
                                     <option value="">All Priorities</option>
                                     <option value="low" {{ request('priority') == 'low' ? 'selected' : '' }}>Low</option>
                                     <option value="medium" {{ request('priority') == 'medium' ? 'selected' : '' }}>Medium</option>
@@ -53,7 +53,7 @@
                             </div>
                             <div class="col-md-3">
                                 <label for="category_id" class="form-label">Category</label>
-                                <select name="category_id" id="category_id" class="form-select">
+                                <select name="category_id" id="category_id" class="form-select rounded-3">
                                     <option value="">All Categories</option>
                                     @foreach($categories as $category)
                                         <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
@@ -64,7 +64,7 @@
                             </div>
                             <div class="col-md-3">
                                 <label for="sort_by" class="form-label">Sort By</label>
-                                <select name="sort_by" id="sort_by" class="form-select">
+                                <select name="sort_by" id="sort_by" class="form-select rounded-3">
                                     <option value="created_at" {{ request('sort_by') == 'created_at' ? 'selected' : '' }}>Created Date</option>
                                     <option value="title" {{ request('sort_by') == 'title' ? 'selected' : '' }}>Title</option>
                                     <option value="priority" {{ request('sort_by') == 'priority' ? 'selected' : '' }}>Priority</option>
@@ -73,15 +73,15 @@
                             </div>
                             <div class="col-md-3">
                                 <label for="date_from" class="form-label">From Date</label>
-                                <input type="date" name="date_from" id="date_from" class="form-control" value="{{ request('date_from') }}">
+                                <input type="date" name="date_from" id="date_from" class="form-control rounded-3" value="{{ request('date_from') }}">
                             </div>
                             <div class="col-md-3">
                                 <label for="date_to" class="form-label">To Date</label>
-                                <input type="date" name="date_to" id="date_to" class="form-control" value="{{ request('date_to') }}">
+                                <input type="date" name="date_to" id="date_to" class="form-control rounded-3" value="{{ request('date_to') }}">
                             </div>
                             <div class="col-md-3">
                                 <label for="sort_order" class="form-label">Sort Order</label>
-                                <select name="sort_order" id="sort_order" class="form-select">
+                                <select name="sort_order" id="sort_order" class="form-select rounded-3">
                                     <option value="desc" {{ request('sort_order') == 'desc' ? 'selected' : '' }}>Descending</option>
                                     <option value="asc" {{ request('sort_order') == 'asc' ? 'selected' : '' }}>Ascending</option>
                                 </select>
