@@ -100,74 +100,75 @@
                             submitButton.innerHTML = 'Signing in...';
                             
                             const formData = new FormData(form);
-                            const response = await window.axios.post(form.action, {
-                                email: formData.get('email'),
-                                password: formData.get('password'),
-                                remember: formData.get('remember')
+                            const response = await fetch(form.action, {
+                                method: 'POST',
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                },
+                                body: formData
                             });
+
+                            // First check if response is JSON
+                            const contentType = response.headers.get('content-type');
+                            let data;
                             
-                            // Store the token
-                            if (response.data.token) {
-                                if (window.auth && typeof window.auth.setToken === 'function') {
-                                    window.auth.setToken(response.data.token);
-                                    
-                                    // Redirect based on response or default
-                                    const redirectTo = response.data.redirect_to || '/dashboard';
-                                    window.location.href = redirectTo;
+                            if (contentType && contentType.includes('application/json')) {
+                                data = await response.json();
+                            } else {
+                                // If not JSON, redirect to the response URL (handles regular form submission)
+                                window.location.href = response.url;
+                                return;
+                            }
+
+                            if (response.ok) {
+                                // If we have a redirect URL, use it
+                                if (data.redirect) {
+                                    window.location.href = data.redirect;
                                 } else {
-                                    console.error('Auth module not loaded');
-                                    alert('Authentication error. Please refresh the page and try again.');
+                                    // Default redirect if no redirect URL is provided
+                                    window.location.href = '/dashboard';
+                                }
+                            } else {
+                                // Handle validation errors
+                                if (data.errors) {
+                                    Object.keys(data.errors).forEach(field => {
+                                        const input = form.querySelector(`[name="${field}"]`);
+                                        if (input) {
+                                            input.classList.add('border-red-500');
+                                            const errorDiv = document.createElement('div');
+                                            errorDiv.className = 'text-red-500 text-sm mt-1';
+                                            errorDiv.textContent = data.errors[field][0];
+                                            input.parentNode.insertBefore(errorDiv, input.nextSibling);
+                                        }
+                                    });
+                                } else if (data.message) {
+                                    alert(data.message);
                                 }
                             }
                         } catch (error) {
                             console.error('Login error:', error);
-                            let errorMessage = 'An error occurred during login';
-                            
-                            if (error.response) {
-                                if (error.response.data.message) {
-                                    errorMessage = error.response.data.message;
-                                } else if (error.response.status === 422) {
-                                    errorMessage = 'Invalid email or password';
-                                }
-                            }
-                            
-                            // Show error message
-                            if (window.Swal) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Login Failed',
-                                    text: errorMessage,
-                                    confirmButtonColor: '#3085d6',
-                                });
-                            } else {
-                                alert(errorMessage);
-                            }
+                            alert('An error occurred during login. Please try again.');
                         } finally {
-                            // Reset button state
                             submitButton.disabled = false;
                             submitButton.innerHTML = originalButtonText;
                         }
                     });
                 }
             });
-        </script>
-        <script>
+            
             function togglePasswordVisibility(fieldId, button) {
                 const field = document.getElementById(fieldId);
                 const type = field.getAttribute('type') === 'password' ? 'text' : 'password';
                 field.setAttribute('type', type);
                 
-                // Toggle icon directly in the clicked button
+                // Toggle icon
                 const icon = button.querySelector('svg');
                 if (type === 'text') {
-                    icon.innerHTML = `
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                    `;
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />';
                 } else {
-                    icon.innerHTML = `
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    `;
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
                 }
             }
         </script>

@@ -80,20 +80,20 @@
                 <div class="card-body">
                     <div class="row text-center">
                         <div class="col-12 mb-3">
-                            <div class="border-start border-primary border-3 p-3">
+                            <div class="border-start border-primary border-3 p-3 rounded-4 rounded-4">
                                 <div class="text-primary fw-bold">{{ $complaintsCreated ?? 0 }}</div>
                                 <div class="text-uppercase small">Complaints Created</div>
                             </div>
                         </div>
                         @if($user->role === 'staff')
                             <div class="col-12 mb-3">
-                                <div class="border-start border-warning border-3 p-3">
+                                <div class="border-start border-warning border-3 p-3 rounded-4">
                                     <div class="text-warning fw-bold">{{ $complaintsAssigned ?? 0 }}</div>
                                     <div class="text-uppercase small">Complaints Assigned</div>
                                 </div>
                             </div>
                             <div class="col-12 mb-3">
-                                <div class="border-start border-success border-3 p-3">
+                                <div class="border-start border-success border-3 p-3 rounded-4">
                                     <div class="text-success fw-bold">{{ $complaintsResolved ?? 0 }}</div>
                                     <div class="text-uppercase small">Complaints Resolved</div>
                                 </div>
