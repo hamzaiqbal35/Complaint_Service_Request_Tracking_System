@@ -131,6 +131,59 @@
                 
                 <div class="flex items-center gap-4">
 
+                    <!-- Notifications Dropdown (Alpine) -->
+                    <div class="relative" x-data="{ 
+                        notifOpen: false, 
+                        unreadCount: {{ auth()->user()->unreadNotifications->count() }},
+                        markAllRead() {
+                            fetch('{{ route('notifications.mark-all-read') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Accept': 'application/json'
+                                }
+                            }).then(res => res.json()).then(data => {
+                                if(data.success) {
+                                    this.unreadCount = 0;
+                                    document.querySelectorAll('.unread-indicator').forEach(el => el.remove());
+                                }
+                            });
+                        }
+                    }">
+                        <button @click="notifOpen = !notifOpen" @click.away="notifOpen = false" class="relative p-2 text-slate-400 hover:text-teal-600 transition-colors focus:outline-none">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span x-show="unreadCount > 0" x-text="unreadCount" class="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-rose-500 rounded-full"></span>
+                        </button>
+                        
+                        <div x-show="notifOpen" x-transition
+                             class="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] border border-slate-100 py-2 z-50 overflow-hidden" x-cloak>
+                            <div class="px-4 py-2 flex justify-between items-center border-b border-slate-50">
+                                <span class="font-bold text-slate-700">Notifications</span>
+                                <button @click="markAllRead()" x-show="unreadCount > 0" class="text-xs text-teal-600 hover:text-teal-700 font-medium">Mark all read</button>
+                            </div>
+                            <div class="max-h-80 overflow-y-auto custom-scrollbar">
+                                @forelse(auth()->user()->notifications->take(5) as $notification)
+                                    <a href="{{ $notification->data['url'] ?? '#' }}" class="block px-4 py-3 hover:bg-slate-50 transition-colors border-b border-slate-50 relative {{ $notification->read_at ? 'opacity-70' : '' }}">
+                                        @if(!$notification->read_at)
+                                            <span class="unread-indicator absolute top-3 right-4 w-2 h-2 bg-teal-500 rounded-full"></span>
+                                        @endif
+                                        <p class="text-sm font-semibold text-slate-800">{{ $notification->data['title'] }}</p>
+                                        <p class="text-xs text-slate-500 mt-1 line-clamp-2">{{ $notification->data['message'] }}</p>
+                                        <p class="text-[10px] text-slate-400 mt-1">{{ $notification->created_at->diffForHumans() }}</p>
+                                    </a>
+                                @empty
+                                    <div class="px-4 py-6 text-center text-slate-500 text-sm">
+                                        No notifications yet.
+                                    </div>
+                                @endforelse
+                            </div>
+                            <div class="px-4 py-2 border-t border-slate-50 flex items-center justify-between">
+                                <span class="text-xs text-slate-400">Showing latest 5</span>
+                                <a href="{{ route('notifications.index') }}" class="text-xs font-semibold text-teal-600 hover:text-teal-700">View All</a>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Profile Dropdown (Alpine) -->
                     <div class="relative" x-data="{ profileOpen: false }">
                         <button @click="profileOpen = !profileOpen" @click.away="profileOpen = false" class="flex items-center gap-3 focus:outline-none bg-white hover:bg-slate-50 border border-slate-200 rounded-xl p-1.5 pl-2 transition-colors shadow-sm">

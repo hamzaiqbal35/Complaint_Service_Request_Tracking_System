@@ -9,6 +9,9 @@ use App\Models\Category;
 use App\Models\Complaint;
 use App\Models\ComplaintLog;
 use App\Models\User;
+use App\Notifications\ComplaintAssigned;
+use App\Notifications\ComplaintRejected;
+use App\Notifications\ComplaintStatusUpdated;
 use Illuminate\Http\Request;
 
 class ComplaintAdminController extends Controller
@@ -80,6 +83,10 @@ class ComplaintAdminController extends Controller
             'meta' => ['assigned_to' => $complaint->assigned_to],
         ]);
 
+        if ($complaint->assignee) {
+            $complaint->assignee->notify(new ComplaintAssigned($complaint));
+        }
+
         return back()->with('success', 'Assignment updated.');
     }
 
@@ -99,6 +106,12 @@ class ComplaintAdminController extends Controller
             'meta' => ['from' => $from, 'to' => $complaint->status],
         ]);
 
+        if ($complaint->status === 'rejected') {
+            $complaint->creator->notify(new ComplaintRejected($complaint));
+        } else {
+            $complaint->creator->notify(new ComplaintStatusUpdated($complaint));
+        }
+
         return back()->with('success', 'Status updated.');
     }
 
@@ -111,7 +124,7 @@ class ComplaintAdminController extends Controller
         ]);
 
         $complaint->update($validated);
-        
+
         return redirect()->route('admin.complaints.index')->with('success', 'Complaint updated.');
     }
 }

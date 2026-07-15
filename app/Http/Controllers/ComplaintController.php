@@ -6,6 +6,11 @@ use App\Http\Requests\StoreComplaintRequest;
 use App\Models\Category;
 use App\Models\Complaint;
 use App\Models\ComplaintLog;
+use App\Models\User;
+use App\Notifications\ComplaintWithdrawn;
+use App\Notifications\NewComplaintCreated;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 
 class ComplaintController extends Controller
 {
@@ -40,6 +45,9 @@ class ComplaintController extends Controller
             'message' => 'Complaint created',
         ]);
 
+        $admins = User::where('role', 'admin')->get();
+        Notification::send($admins, new NewComplaintCreated($complaint));
+
         return redirect()->route('complaints.index')->with('success', 'Complaint submitted.');
     }
 
@@ -51,7 +59,7 @@ class ComplaintController extends Controller
         return view('complaints.show', compact('complaint'));
     }
 
-    public function update(\Illuminate\Http\Request $request, Complaint $complaint)
+    public function update(Request $request, Complaint $complaint)
     {
         $this->authorizeView($complaint);
 
@@ -63,9 +71,9 @@ class ComplaintController extends Controller
             if ($complaint->status !== 'pending') {
                 abort(403, 'You can only withdraw a pending complaint.');
             }
-            
+
             $complaint->update(['status' => 'withdrawn']);
-            
+
             ComplaintLog::create([
                 'complaint_id' => $complaint->id,
                 'user_id' => auth()->id(),
@@ -73,7 +81,14 @@ class ComplaintController extends Controller
                 'message' => 'Complaint withdrawn by user',
                 'meta' => ['from' => 'pending', 'to' => 'withdrawn'],
             ]);
-            
+
+            $admins = User::where('role', 'admin')->get();
+            Notification::send($admins, new ComplaintWithdrawn($complaint));
+
+            if ($complaint->assignee) {
+                $complaint->assignee->notify(new ComplaintWithdrawn($complaint));
+            }
+
             return back()->with('success', 'Complaint withdrawn successfully.');
         }
 

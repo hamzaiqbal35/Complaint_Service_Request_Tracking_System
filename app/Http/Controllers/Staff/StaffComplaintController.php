@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateComplaintStatusRequest;
 use App\Models\Category;
 use App\Models\Complaint;
 use App\Models\ComplaintLog;
+use App\Notifications\ComplaintStatusUpdated;
 use Illuminate\Http\Request;
 
 class StaffComplaintController extends Controller
@@ -95,6 +96,8 @@ class StaffComplaintController extends Controller
             'message' => $request->input('message'),
             'meta' => ['from' => $from, 'to' => $complaint->status],
         ]);
+
+        $complaint->creator->notify(new ComplaintStatusUpdated($complaint));
 
         return back()->with('success', 'Status updated.');
     }

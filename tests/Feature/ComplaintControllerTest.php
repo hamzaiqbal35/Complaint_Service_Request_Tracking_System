@@ -94,7 +94,7 @@ class ComplaintControllerTest extends TestCase
             'id' => $complaint->id,
             'status' => 'withdrawn',
         ]);
-        
+
         $this->assertDatabaseHas('complaint_logs', [
             'complaint_id' => $complaint->id,
             'action' => 'withdrawn',
