@@ -11,15 +11,17 @@ class ComplaintController extends Controller
 {
     public function index()
     {
-        $complaints = Complaint::with('category','assignee')
+        $complaints = Complaint::with('category', 'assignee')
             ->where('created_by', auth()->id())
             ->latest()->paginate(10);
+
         return view('complaints.index', compact('complaints'));
     }
 
     public function create()
     {
         $categories = Category::orderBy('name')->get();
+
         return view('complaints.create', compact('categories'));
     }
 
@@ -44,14 +46,44 @@ class ComplaintController extends Controller
     public function show(Complaint $complaint)
     {
         $this->authorizeView($complaint);
-        $complaint->load('logs.user','category','assignee');
+        $complaint->load('logs.user', 'category', 'assignee');
+
         return view('complaints.show', compact('complaint'));
+    }
+
+    public function update(\Illuminate\Http\Request $request, Complaint $complaint)
+    {
+        $this->authorizeView($complaint);
+
+        $validated = $request->validate([
+            'status' => 'sometimes|in:withdrawn',
+        ]);
+
+        if ($request->has('status') && $request->input('status') === 'withdrawn') {
+            if ($complaint->status !== 'pending') {
+                abort(403, 'You can only withdraw a pending complaint.');
+            }
+            
+            $complaint->update(['status' => 'withdrawn']);
+            
+            ComplaintLog::create([
+                'complaint_id' => $complaint->id,
+                'user_id' => auth()->id(),
+                'action' => 'withdrawn',
+                'message' => 'Complaint withdrawn by user',
+                'meta' => ['from' => 'pending', 'to' => 'withdrawn'],
+            ]);
+            
+            return back()->with('success', 'Complaint withdrawn successfully.');
+        }
+
+        return redirect()->route('complaints.index')->with('success', 'Complaint updated.');
     }
 
     protected function authorizeView(Complaint $complaint): void
     {
-        if ($complaint->created_by !== auth()->id() && !auth()->user()->isAdmin()) abort(403);
+        if ($complaint->created_by !== auth()->id() && ! auth()->user()->isAdmin()) {
+            abort(403);
+        }
     }
 }
-
-

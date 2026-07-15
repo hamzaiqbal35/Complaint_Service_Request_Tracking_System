@@ -6,14 +6,16 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateComplaintStatusRequest extends FormRequest
 {
-    public function authorize(): bool { return auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isStaff()); }
+    public function authorize(): bool
+    {
+        return auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isStaff());
+    }
 
-    public function rules(): array {
+    public function rules(): array
+    {
         return [
-            'status' => ['required','in:pending,in_progress,resolved,rejected'],
-            'message' => ['nullable','string','max:2000'],
+            'status' => ['required', 'in:pending,in_progress,resolved,rejected,withdrawn'],
+            'message' => ['nullable', 'string', 'max:2000'],
         ];
     }
 }
-
-

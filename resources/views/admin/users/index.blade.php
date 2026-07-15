@@ -1,399 +1,262 @@
 @extends('layouts.admin')
 
-@section('admin')
-<style>[x-cloak]{display:none!important}</style>
-<div class="container-fluid">
-    <div x-data="{ open: false }">
-    <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
-        <h1 class="h3 mb-0 text-gray-800">User Management</h1>
-        <div class="d-flex gap-2">
-            <button id="filterToggleButton" class="btn btn-outline-primary" type="button"
-                    @click="open = !open" :aria-expanded="open.toString()" aria-controls="filterPanel">
-                <i class="fas fa-filter"></i> Filters
+@section('content')
+<div x-data="{ 
+    filterOpen: {{ request()->hasAny(['role', 'search', 'sort_by', 'sort_order']) ? 'true' : 'false' }},
+    deleteModalOpen: false,
+    userToDelete: null,
+    userNameToDelete: '',
+    confirmDelete(id, name) {
+        this.userToDelete = id;
+        this.userNameToDelete = name;
+        this.deleteModalOpen = true;
+        // The form action will be dynamically constructed in Blade, but we can just use the base URL and append ID
+        document.getElementById('deleteForm').action = '/admin/users/' + id;
+    }
+}">
+
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-3xl font-black text-slate-800 tracking-tight">User Management</h1>
+            <p class="text-slate-500 mt-1">Manage all system users, roles, and permissions.</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            <button @click="filterOpen = !filterOpen" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50 hover:border-teal-300 transition-all font-medium shadow-sm">
+                <i class="fas fa-filter text-slate-400"></i> Filters
             </button>
-            <a href="{{ route('admin.users.export', request()->query()) }}" class="btn btn-success">
-                <i class="fas fa-download me-1"></i> Export Users
+            <a href="{{ route('admin.users.export', request()->query()) }}" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50 hover:border-teal-300 transition-all font-medium shadow-sm">
+                <i class="fas fa-download text-slate-400"></i> Export
             </a>
-            <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
-                <i class="fas fa-plus me-1"></i> Add User
+            <a href="{{ route('admin.users.create') }}" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl transition-all shadow-[0_8px_20px_-6px_rgba(16,185,129,0.4)] font-medium">
+                <i class="fas fa-plus"></i> Add User
             </a>
         </div>
     </div>
 
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
-    <!-- Filter Section (Alpine.js) -->
-    <div id="filterPanel" class="mb-4" x-cloak x-show="open" x-transition>
-        <div class="card">
-            <div class="card-body">
-                <form method="GET" action="{{ route('admin.users.index') }}" class="row g-3">
-                    <div class="col-md-3">
-                        <label for="role" class="form-label">Role</label>
-                        <select name="role" id="role" class="form-select rounded-3">
+    <!-- Filter Panel -->
+    <div x-show="filterOpen" x-collapse x-cloak class="mb-8">
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+            <form method="GET" action="{{ route('admin.users.index') }}">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Role -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Role</label>
+                        <select name="role" class="w-full bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all appearance-none">
                             <option value="">All Roles</option>
                             <option value="user" {{ request('role') == 'user' ? 'selected' : '' }}>User</option>
                             <option value="staff" {{ request('role') == 'staff' ? 'selected' : '' }}>Staff</option>
                             <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
-                        <label for="search" class="form-label">Search</label>
-                        <input type="text" name="search" id="search" class="form-control rounded-3" placeholder="Name or Email" value="{{ request('search') }}">
+                    <!-- Search -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Search</label>
+                        <input type="text" name="search" placeholder="Name or Email" value="{{ request('search') }}" class="w-full bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all">
                     </div>
-                    <div class="col-md-2">
-                        <label for="sort_by" class="form-label">Sort By</label>
-                        <select name="sort_by" id="sort_by" class="form-select rounded-3">
+                    <!-- Sort By -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Sort By</label>
+                        <select name="sort_by" class="w-full bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all appearance-none">
                             <option value="created_at" {{ request('sort_by') == 'created_at' ? 'selected' : '' }}>Created Date</option>
                             <option value="name" {{ request('sort_by') == 'name' ? 'selected' : '' }}>Name</option>
                             <option value="email" {{ request('sort_by') == 'email' ? 'selected' : '' }}>Email</option>
                             <option value="role" {{ request('sort_by') == 'role' ? 'selected' : '' }}>Role</option>
                         </select>
                     </div>
-                    <div class="col-md-2">
-                        <label for="sort_order" class="form-label">Sort Order</label>
-                        <select name="sort_order" id="sort_order" class="form-select rounded-3">
+                    <!-- Sort Order -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Sort Order</label>
+                        <select name="sort_order" class="w-full bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all appearance-none">
                             <option value="desc" {{ request('sort_order') == 'desc' ? 'selected' : '' }}>Descending</option>
                             <option value="asc" {{ request('sort_order') == 'asc' ? 'selected' : '' }}>Ascending</option>
                         </select>
                     </div>
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-primary">Apply Filters</button>
-                        <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Clear Filters</a>
-                    </div>
-                </form>
+                </div>
+                
+                <div class="flex items-center gap-3 mt-6 border-t border-slate-100 pt-6">
+                    <button type="submit" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl transition-all shadow-md font-medium">
+                        Apply Filters
+                    </button>
+                    <a href="{{ route('admin.users.index') }}" class="px-6 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-xl transition-all font-medium">
+                        Clear
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center justify-between group hover:shadow-md transition-all">
+            <div>
+                <p class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Total Users</p>
+                <p class="text-3xl font-black text-slate-800">{{ $stats['total'] }}</p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-teal-50 flex items-center justify-center text-teal-500 border border-teal-100 group-hover:scale-110 transition-transform">
+                <i class="fas fa-users text-xl"></i>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center justify-between group hover:shadow-md transition-all">
+            <div>
+                <p class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Regular Users</p>
+                <p class="text-3xl font-black text-slate-800">{{ $stats['users'] }}</p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 border border-blue-100 group-hover:scale-110 transition-transform">
+                <i class="fas fa-user text-xl"></i>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center justify-between group hover:shadow-md transition-all">
+            <div>
+                <p class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Staff Members</p>
+                <p class="text-3xl font-black text-slate-800">{{ $stats['staff'] }}</p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500 border border-amber-100 group-hover:scale-110 transition-transform">
+                <i class="fas fa-user-tie text-xl"></i>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center justify-between group hover:shadow-md transition-all">
+            <div>
+                <p class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Administrators</p>
+                <p class="text-3xl font-black text-slate-800">{{ $stats['admins'] }}</p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500 border border-rose-100 group-hover:scale-110 transition-transform">
+                <i class="fas fa-user-shield text-xl"></i>
             </div>
         </div>
     </div>
 
-    <!-- Statistics Cards -->
-    <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2 stat-card">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Users</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['total'] }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-users fa-2x text-blue-800"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2 stat-card">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Regular Users</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['users'] }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-user fa-2x text-blue-500"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2 stat-card">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Staff Members</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['staff'] }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-user-tie fa-2x text-yellow-800"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2 stat-card">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Administrators</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['admins'] }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-user-shield fa-2x text-green-600"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Users Table -->
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Users List</h6>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered" width="100%" cellspacing="0">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Email Verified</th>
-                            <th>Created At</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($users as $user)
-                            <tr>
-                                <td>{{ $user->id }}</td>
-                                <td>{{ $user->name }}</td>
-                                <td>{{ $user->email }}</td>
-                                <td>
-                                    <span class="badge bg-{{ $user->role == 'admin' ? 'danger' : ($user->role == 'staff' ? 'warning' : 'info') }}">
-                                        {{ ucfirst($user->role) }}
-                                    </span>
-                                </td>
-                                <td>
-                                    @if($user->email_verified_at)
-                                        <span class="badge bg-success">Verified</span>
-                                    @else
-                                        <span class="badge bg-secondary">Not Verified</span>
-                                        <form action="{{ route('admin.users.verify-email', $user->id) }}" method="POST" class="d-inline">
+    <!-- Data Table -->
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50/50">
+                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">User Details</th>
+                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">Role</th>
+                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">Verification</th>
+                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">Joined</th>
+                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse($users as $user)
+                        <tr class="hover:bg-slate-50/80 transition-colors group">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                                        {{ substr($user->name, 0, 1) }}
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-sm font-bold text-slate-800 group-hover:text-teal-600 transition-colors">{{ $user->name }}</span>
+                                        <span class="text-xs text-slate-500 mt-0.5">{{ $user->email }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                @php
+                                    $roleColors = [
+                                        'admin' => 'bg-rose-50 text-rose-600 border-rose-200',
+                                        'staff' => 'bg-amber-50 text-amber-600 border-amber-200',
+                                        'user' => 'bg-blue-50 text-blue-600 border-blue-200'
+                                    ];
+                                    $rColor = $roleColors[$user->role] ?? 'bg-slate-50 text-slate-600 border-slate-200';
+                                @endphp
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border {{ $rColor }}">
+                                    {{ ucfirst($user->role) }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                @if($user->email_verified_at)
+                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-600 text-xs font-medium">
+                                        <i class="fas fa-check-circle"></i> Verified
+                                    </div>
+                                @else
+                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-slate-500 text-xs font-medium mb-1">
+                                        <i class="fas fa-clock"></i> Pending
+                                    </div>
+                                    <form action="{{ route('admin.users.verify-email', $user->id) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="text-[10px] font-bold text-teal-600 hover:text-teal-700 hover:underline">
+                                            Verify Now
+                                        </button>
+                                    </form>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="text-sm text-slate-500 font-medium">{{ $user->created_at->format('M d, Y') }}</span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="{{ route('admin.users.show', $user) }}" class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-teal-600 hover:border-teal-200 hover:bg-teal-50 transition-all shadow-sm" title="View">
+                                        <i class="fas fa-eye text-sm"></i>
+                                    </a>
+                                    <a href="{{ route('admin.users.edit', $user) }}" class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all shadow-sm" title="Edit">
+                                        <i class="fas fa-edit text-sm"></i>
+                                    </a>
+                                    
+                                    @if(!$user->hasVerifiedEmail())
+                                        <form action="{{ route('admin.users.verify-email', $user) }}" method="POST" class="inline">
                                             @csrf
-                                            <button type="submit" class="btn btn-sm btn-link">
-                                                Verify Now
+                                            <button type="submit" class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-emerald-600 hover:border-emerald-200 hover:bg-emerald-50 transition-all shadow-sm" title="Verify Email">
+                                                <i class="fas fa-check text-sm"></i>
                                             </button>
                                         </form>
                                     @endif
-                                </td>
-                                <td>{{ $user->created_at->format('M d, Y') }}</td>
-                                <td>
-                                    <div class="btn-group" role="group">
-                                        <a href="{{ route('admin.users.show', $user) }}" class="btn btn-sm btn-info" title="View">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-primary" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        @if($user->id !== auth()->id())
-                                            <button type="button" class="btn btn-sm btn-danger" title="Delete" 
-                                                    onclick="confirmDelete({{ $user->id }}, '{{ $user->name }}')">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        @endif
 
-                                        @if(!$user->hasVerifiedEmail())
-                                            <form action="{{ route('admin.users.verify-email', $user) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                <button type="submit" class="btn btn-sm btn-success" title="Verify Email">
-                                                    <i class="fas fa-check"></i>
-                                                </button>
-                                            </form>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="7" class="text-center">No users found</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Pagination -->
-            <div class="d-flex justify-content-center">
-                {{ $users->links() }}
-            </div>
+                                    @if($user->id !== auth()->id())
+                                        <button type="button" @click="confirmDelete({{ $user->id }}, '{{ addslashes($user->name) }}')" class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 transition-all shadow-sm" title="Delete">
+                                            <i class="fas fa-trash-alt text-sm"></i>
+                                        </button>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-12 text-center">
+                                <div class="flex flex-col items-center justify-center text-slate-400">
+                                    <i class="fas fa-users-slash text-4xl mb-3 text-slate-300"></i>
+                                    <p class="text-sm font-medium">No users found.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="p-6 border-t border-slate-100 flex justify-center">
+            {{ $users->links('pagination::tailwind') }}
         </div>
     </div>
-</div>
 
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Delete Modal -->
+    <div x-show="deleteModalOpen" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto overflow-x-hidden bg-slate-900/50 backdrop-blur-sm p-4 text-center sm:p-0">
+        <div x-show="deleteModalOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="relative overflow-hidden rounded-2xl bg-white text-left shadow-xl sm:my-8 sm:w-full sm:max-w-lg border border-slate-100" @click.away="deleteModalOpen = false">
+            <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-rose-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <i class="fas fa-exclamation-triangle text-rose-600"></i>
+                    </div>
+                    <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                        <h3 class="text-lg font-bold leading-6 text-slate-900" id="modal-title">Delete User</h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-slate-500">Are you sure you want to delete <strong class="text-slate-800" x-text="userNameToDelete"></strong>? All of their data will be permanently removed. This action cannot be undone.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete user <strong id="deleteUserName"></strong>?</p>
-                <p class="text-danger"><small>This action cannot be undone.</small></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form id="deleteForm" method="POST" style="display: inline;">
+            <div class="bg-slate-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 border-t border-slate-100">
+                <form id="deleteForm" method="POST">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="submit" class="inline-flex w-full justify-center rounded-xl bg-rose-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-rose-500 sm:ml-3 sm:w-auto">Delete</button>
                 </form>
+                <button type="button" @click="deleteModalOpen = false" class="mt-3 inline-flex w-full justify-center rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 sm:mt-0 sm:w-auto">Cancel</button>
             </div>
         </div>
     </div>
+
 </div>
-
-<style>
-.stat-card {
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-.stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-}
-
-.border-left-primary {
-    border-left: 0.25rem solid #4e73df !important;
-}
-
-.border-left-success {
-    border-left: 0.25rem solid #1cc88a !important;
-}
-
-.border-left-info {
-    border-left: 0.25rem solid #36b9cc !important;
-}
-
-.border-left-warning {
-    border-left: 0.25rem solid #f6c23e !important;
-}
-
-.badge {
-    display: inline-block;
-    padding: 0.35em 0.65em;
-    font-size: 0.75em;
-    font-weight: 700;
-    line-height: 1;
-    color: #fff;
-    text-align: center;
-    white-space: nowrap;
-    vertical-align: baseline;
-    border-radius: 0.25rem;
-}
-
-.bg-info {
-    background-color: #36b9cc !important;
-}
-
-.bg-warning {
-    background-color: #f6c23e !important;
-}
-
-.bg-danger {
-    background-color: #e74a3b !important;
-}
-
-.bg-success {
-    background-color: #1cc88a !important;
-}
-
-.bg-secondary {
-    background-color: #858796 !important;
-}
-
-.btn-group .btn {
-    margin-right: 2px;
-}
-</style>
-
-<script>
-function confirmDelete(userId, userName) {
-    document.getElementById('deleteUserName').textContent = userName;
-    document.getElementById('deleteForm').action = `/admin/users/${userId}`;
-    
-    var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-    deleteModal.show();
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-
-    // Handle delete form submission
-    const deleteForm = document.getElementById('deleteForm');
-    if (deleteForm) {
-        deleteForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const form = this;
-            const url = form.action;
-            const token = document.querySelector('meta[name="csrf-token"]').content;
-            
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': token,
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'X-HTTP-Method-Override': 'DELETE'
-                },
-                body: JSON.stringify({
-                    _method: 'DELETE',
-                    _token: token
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(err => { throw err; });
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Close the modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
-                if (modal) modal.hide();
-                
-                if (data.success) {
-                    // Show success message
-                    if (data.message) {
-                        alert(data.message);
-                    }
-                    // Reload the page to reflect changes
-                    window.location.reload();
-                } else {
-                    throw new Error(data.message || 'Failed to delete user');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert(error.message || 'An error occurred while deleting the user');
-            });
-        });
-    }
-
-    // Add animation to stat cards
-    const statCards = document.querySelectorAll('.stat-card');
-    statCards.forEach((card, index) => {
-        card.style.animationDelay = `${index * 0.1}s`;
-        card.classList.add('animate__animated', 'animate__fadeInUp');
-    });
-});
-</script>
 @endsection

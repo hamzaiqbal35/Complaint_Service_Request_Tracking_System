@@ -16,8 +16,13 @@ class ComplaintLog extends Model
         'meta' => 'array',
     ];
 
-    public function complaint(): BelongsTo { return $this->belongsTo(Complaint::class); }
-    public function user(): BelongsTo { return $this->belongsTo(User::class); }
+    public function complaint(): BelongsTo
+    {
+        return $this->belongsTo(Complaint::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }
-
-

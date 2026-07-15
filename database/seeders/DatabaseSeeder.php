@@ -30,7 +30,7 @@ class DatabaseSeeder extends Seeder
         User::factory()->count(15)->create(['role' => 'user']);
 
         // Categories
-        $names = ['IT','Electrical','HR','Maintenance','Plumbing','Security'];
+        $names = ['IT', 'Electrical', 'HR', 'Maintenance', 'Plumbing', 'Security'];
         foreach ($names as $name) {
             Category::firstOrCreate(
                 ['slug' => str($name)->slug()],

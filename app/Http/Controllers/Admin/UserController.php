@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -22,9 +22,9 @@ class UserController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -39,7 +39,7 @@ class UserController extends Controller
         // Apply sorting with whitelist (robust null/empty handling)
         $allowedSorts = ['id', 'name', 'email', 'role', 'created_at'];
         $requestedSortBy = $request->get('sort_by');
-        $sortBy = in_array($requestedSortBy, $allowedSorts, true) && !empty($requestedSortBy)
+        $sortBy = in_array($requestedSortBy, $allowedSorts, true) && ! empty($requestedSortBy)
             ? $requestedSortBy
             : 'created_at';
         $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
@@ -89,7 +89,7 @@ class UserController extends Controller
         $complaintsCreated = $user->complaints()->count();
         $complaintsAssigned = $user->assignedComplaints()->count();
         $complaintsResolved = $user->assignedComplaints()->where('status', 'resolved')->count();
-        
+
         return view('admin.users.show', compact('user', 'complaintsCreated', 'complaintsAssigned', 'complaintsResolved'));
     }
 
@@ -128,33 +128,18 @@ class UserController extends Controller
         try {
             // Prevent deleting the currently authenticated user
             if ($user->id === auth()->id()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'You cannot delete your own account.'
-                ], 403);
-            }
-
-            // Check if user has any associated complaints
-            if ($user->complaints()->exists() || $user->assignedComplaints()->exists()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Cannot delete user with associated complaints.'
-                ], 422);
+                return back()->with('error', 'You cannot delete your own account.');
             }
 
             $user->delete();
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'User deleted successfully.'
-            ]);
-            
+
+            return redirect()->route('admin.users.index')
+                ->with('success', 'User deleted successfully.');
+
         } catch (\Exception $e) {
-            \Log::error('Error deleting user: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'An error occurred while deleting the user.'
-            ], 500);
+            \Log::error('Error deleting user: '.$e->getMessage());
+
+            return back()->with('error', 'An error occurred while deleting the user.');
         }
     }
 
@@ -169,9 +154,9 @@ class UserController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -186,7 +171,7 @@ class UserController extends Controller
         // Apply sorting consistent with index (robust null/empty handling)
         $allowedSorts = ['id', 'name', 'email', 'role', 'created_at'];
         $requestedSortBy = $request->get('sort_by');
-        $sortBy = in_array($requestedSortBy, $allowedSorts, true) && !empty($requestedSortBy)
+        $sortBy = in_array($requestedSortBy, $allowedSorts, true) && ! empty($requestedSortBy)
             ? $requestedSortBy
             : 'created_at';
         $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
@@ -196,15 +181,15 @@ class UserController extends Controller
 
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="users_' . date('Y-m-d_H-i-s') . '.csv"',
+            'Content-Disposition' => 'attachment; filename="users_'.date('Y-m-d_H-i-s').'.csv"',
             'Pragma' => 'no-cache',
             'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-            'Expires' => '0'
+            'Expires' => '0',
         ];
 
-        $callback = function() use ($users) {
+        $callback = function () use ($users) {
             $file = fopen('php://output', 'w');
-            
+
             // Add CSV headers
             fputcsv($file, [
                 'ID',
@@ -213,7 +198,7 @@ class UserController extends Controller
                 'Role',
                 'Email Verified',
                 'Created At',
-                'Updated At'
+                'Updated At',
             ]);
 
             // Add data rows
@@ -225,7 +210,7 @@ class UserController extends Controller
                     ucfirst($user->role),
                     $user->email_verified_at ? 'Yes' : 'No',
                     $user->created_at->format('Y-m-d H:i:s'),
-                    $user->updated_at->format('Y-m-d H:i:s')
+                    $user->updated_at->format('Y-m-d H:i:s'),
                 ]);
             }
 
@@ -237,13 +222,13 @@ class UserController extends Controller
 
     public function verifyEmail(User $user)
     {
-        if (!$user->hasVerifiedEmail()) {
+        if (! $user->hasVerifiedEmail()) {
             $user->email_verified_at = now();
             $user->save();
-            
+
             return back()->with('success', 'User email has been verified.');
         }
-        
+
         return back()->with('info', 'User email is already verified.');
     }
 }

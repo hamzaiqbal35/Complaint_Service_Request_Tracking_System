@@ -15,39 +15,43 @@ A comprehensive Laravel-based complaint management system with authentication an
 1. **Users** (`/dashboard`)
    - Submit and track complaints
    - View complaint history and status
-   - Update personal profile
+   - Withdraw pending complaints
+   - Update personal profile and manage account deletion
    - Export complaint history
 
 2. **Staff** (`/staff/dashboard`)
    - View and manage assigned complaints
-   - Update complaint status
+   - Update complaint status (strictly constrained to progressive states)
    - Export complaint data
    - View performance metrics
 
 3. **Administrators** (`/admin/dashboard`)
-   - Manage all system users
+   - Manage all system users (including deleting accounts)
    - Handle categories and departments
    - View system analytics and reports
    - Export user and complaint data
    - Manage user email verification
+   - Full authority over complaint states (including rejecting)
 
 ### Core Functionality
 - **Complaint Management**: Full CRUD operations for complaints
+- **Strict Status Transitions**: Enforced logic for progressing complaints, with withdraw options for users
 - **Category Management**: Organize complaints by categories
 - **Search & Filters**: Advanced search with multiple filter options
 - **Data Export**: Export complaints and user data
-- **Activity Logs**: Track all important actions
+- **Activity Logs**: Track all important actions with full timeline visibility
 
 ## 🎨 UI/UX Features
 - Modern, responsive design with Tailwind CSS
 - Mobile-first approach for all devices
 - Intuitive dashboard for each user role
 - Clean and accessible interface
+- SweetAlert2 integration for critical confirmations (e.g., Logout, Account Deletion)
 
 ## 🛠️ Tech Stack
-- **Backend**: PHP 8.1+, Laravel 10.x
-- **Frontend**: HTML5, JavaScript, Tailwind CSS, Alpine.js
-- **Database**: MySQL 8.0+
+- **Backend**: PHP 8.1+, Laravel 10.x/11.x
+- **Frontend**: HTML5, JavaScript, Tailwind CSS, Alpine.js, SweetAlert2
+- **Database**: SQLite / MySQL 8.0+
 - **Authentication**: Laravel Breeze
 - **Deployment**: Compatible with shared hosting
 

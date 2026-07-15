@@ -1,148 +1,273 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <!-- Cache Control -->
-        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-        <meta http-equiv="Pragma" content="no-cache" />
-        <meta http-equiv="Expires" content="0" />
+    <title>{{ config('app.name', 'CSRTS') }}</title>
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+    <!-- Fonts & Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-        
-        <!-- Bootstrap CSS -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        
-        <!-- Font Awesome -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Scripts -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
+    <!-- AlpineJS for interactivity -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-        <!-- Scripts -->
-        @vite([
-            'resources/css/app.css',
-            'resources/js/app.js',
-            'resources/js/auth.js',
-            'resources/js/auth-handler.js'
-        ])
+    @stack('styles')
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased selection:bg-teal-500 selection:text-white" x-data="{ sidebarOpen: false }">
+
+    <div class="flex h-screen overflow-hidden">
         
-        <!-- SweetAlert2 -->
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        
-        @stack('scripts')
-        
-        <style>
-            .sticky-nav {
-                position: sticky;
-                top: 0;
-                z-index: 1030; /* Bootstrap's default z-index for fixed navbars */
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                background-color: #fff; /* Or your preferred background color */
-            }
-            body {
-                padding-top: 0px; /* Height of the navbar */
-            }
-            @media (min-width: 992px) {
-                body {
-                    padding-top: 15px; /* Adjust if your navbar height is different on desktop */
-                }
-            }
-        </style>
-    </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
-            <div class="sticky-nav">
-                @include('layouts.navigation')
+        <!-- Sidebar Backdrop (Mobile) -->
+        <div x-show="sidebarOpen" x-transition:enter="transition-opacity ease-linear duration-300"
+             x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+             x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 z-40 bg-slate-900/80 backdrop-blur-sm lg:hidden" @click="sidebarOpen = false" x-cloak></div>
+
+        <!-- Sidebar -->
+        <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+               class="fixed inset-y-0 left-0 z-50 w-72 bg-slate-900 flex flex-col transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shadow-2xl lg:shadow-none">
+            
+            <!-- Branding -->
+            <div class="flex items-center justify-between h-20 px-6 border-b border-slate-800/50 bg-slate-900/50">
+                <a href="{{ auth()->check() && auth()->user()->isStaff() ? route('staff.dashboard') : route('dashboard') }}" class="flex items-center gap-3 group">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-teal-500/30 group-hover:scale-105 transition-transform">
+                        <i class="fas fa-shield-alt text-white"></i>
+                    </div>
+                    <span class="text-xl font-bold text-white tracking-tight">CSRTS <span class="text-teal-500">{{ auth()->check() && auth()->user()->isStaff() ? 'Staff' : 'Portal' }}</span></span>
+                </a>
+                <button @click="sidebarOpen = false" class="lg:hidden text-slate-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
             </div>
 
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endisset
+            <!-- Navigation Links -->
+            <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto custom-scrollbar">
+                
+                <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-4">Overview</p>
+                
+                @if(auth()->check() && auth()->user()->isStaff())
+                    <a href="{{ route('staff.dashboard') }}" 
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all {{ request()->routeIs('staff.dashboard') ? 'bg-gradient-to-r from-teal-500/20 to-emerald-500/10 text-teal-400 border border-teal-500/20 shadow-inner' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200' }}">
+                        <i class="fas fa-home w-5 text-center"></i>
+                        <span class="font-medium">Dashboard</span>
+                    </a>
 
-            <!-- Page Content -->
-            <main>
-                @hasSection('content')
-                    @yield('content')
+                    <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-6">Management</p>
+
+                    <a href="{{ route('staff.complaints.index') }}" 
+                       class="flex items-center justify-between px-3 py-2.5 rounded-xl transition-all {{ request()->routeIs('staff.complaints.*') ? 'bg-gradient-to-r from-teal-500/20 to-emerald-500/10 text-teal-400 border border-teal-500/20 shadow-inner' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-ticket-alt w-5 text-center"></i>
+                            <span class="font-medium">Assigned Complaints</span>
+                        </div>
+                    </a>
                 @else
-                    {{ $slot ?? '' }}
+                    <a href="{{ route('dashboard') }}" 
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all {{ request()->routeIs('dashboard') ? 'bg-gradient-to-r from-teal-500/20 to-emerald-500/10 text-teal-400 border border-teal-500/20 shadow-inner' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200' }}">
+                        <i class="fas fa-home w-5 text-center"></i>
+                        <span class="font-medium">Dashboard</span>
+                    </a>
+
+                    <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-6">My Activity</p>
+
+                    <a href="{{ route('complaints.index') }}" 
+                       class="flex items-center justify-between px-3 py-2.5 rounded-xl transition-all {{ request()->routeIs('complaints.*') ? 'bg-gradient-to-r from-teal-500/20 to-emerald-500/10 text-teal-400 border border-teal-500/20 shadow-inner' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200' }}">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-list w-5 text-center"></i>
+                            <span class="font-medium">My Complaints</span>
+                        </div>
+                    </a>
+                    
+                    <a href="{{ route('complaints.create') }}" 
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all {{ request()->routeIs('complaints.create') ? 'bg-gradient-to-r from-teal-500/20 to-emerald-500/10 text-teal-400 border border-teal-500/20 shadow-inner' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200' }}">
+                        <i class="fas fa-plus-circle w-5 text-center"></i>
+                        <span class="font-medium">New Complaint</span>
+                    </a>
                 @endif
+            </nav>
+            
+            <!-- Bottom Action -->
+            <div class="p-4 border-t border-slate-800/50">
+                <form method="POST" action="{{ route('logout') }}" id="logout-form">
+                    @csrf
+                    <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-800/50 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl transition-colors border border-slate-700/50">
+                        <i class="fas fa-sign-out-alt text-sm"></i>
+                        <span class="font-medium">Sign Out</span>
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Main Content Wrapper -->
+        <div class="flex-1 flex flex-col overflow-hidden relative">
+            
+            <!-- Top Header -->
+            <header class="h-20 bg-white/80 backdrop-blur-md border-b border-slate-200/50 flex items-center justify-between px-4 sm:px-6 z-30">
+                <div class="flex items-center gap-4">
+                    <button @click="sidebarOpen = true" class="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+                
+                <div class="flex items-center gap-4">
+
+                    <!-- Profile Dropdown (Alpine) -->
+                    <div class="relative" x-data="{ profileOpen: false }">
+                        <button @click="profileOpen = !profileOpen" @click.away="profileOpen = false" class="flex items-center gap-3 focus:outline-none bg-white hover:bg-slate-50 border border-slate-200 rounded-xl p-1.5 pl-2 transition-colors shadow-sm">
+                            <div class="hidden sm:block text-right">
+                                <p class="text-sm font-semibold text-slate-700 leading-tight">{{ Auth::user()->name ?? 'User' }}</p>
+                                <p class="text-[10px] text-slate-500 font-medium uppercase tracking-wider">{{ auth()->check() && auth()->user()->isStaff() ? 'Staff Member' : 'User' }}</p>
+                            </div>
+                            <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center text-white font-bold shadow-sm">
+                                {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
+                            </div>
+                            <i class="fas fa-chevron-down text-xs text-slate-400 pr-2 hidden sm:block"></i>
+                        </button>
+                        
+                        <div x-show="profileOpen" x-transition
+                             class="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] border border-slate-100 py-2 z-50 overflow-hidden" x-cloak>
+                            <a href="{{ route('profile.edit') }}" class="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-teal-600 transition-colors">
+                                <i class="fas fa-user-circle mr-3 w-4 text-slate-400"></i> Profile Settings
+                            </a>
+                            <div class="border-t border-slate-100 my-1"></div>
+                            <form method="POST" action="{{ route('logout') }}" class="logout-form-dropdown">
+                                @csrf
+                                <button type="submit" class="w-full flex items-center text-left px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 transition-colors">
+                                    <i class="fas fa-sign-out-alt mr-3 w-4 text-rose-400"></i> Logout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Scrollable Area -->
+            <main class="flex-1 overflow-y-auto bg-slate-50 p-4 sm:p-6 lg:p-8 relative">
+                <!-- Background decorative elements -->
+                <div class="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-slate-100 to-slate-50 pointer-events-none"></div>
+                
+                <div class="relative max-w-7xl mx-auto">
+                    @if (session('success'))
+                        <div class="mb-6 rounded-2xl bg-emerald-50 border border-emerald-100 p-4 flex items-start shadow-sm" x-data="{ show: true }" x-show="show">
+                            <div class="flex-shrink-0 mt-0.5">
+                                <div class="w-8 h-8 rounded-full bg-emerald-100/50 flex items-center justify-center text-emerald-600">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                            </div>
+                            <div class="ml-3 mt-1 flex-1 text-sm text-emerald-800 font-medium">
+                                {{ session('success') }}
+                            </div>
+                            <div class="ml-auto pl-3 mt-1">
+                                <button @click="show = false" class="text-emerald-500 hover:text-emerald-600 transition-colors">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if (session('error'))
+                        <div class="mb-6 rounded-2xl bg-rose-50 border border-rose-100 p-4 flex items-start shadow-sm" x-data="{ show: true }" x-show="show">
+                            <div class="flex-shrink-0 mt-0.5">
+                                <div class="w-8 h-8 rounded-full bg-rose-100/50 flex items-center justify-center text-rose-600">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                </div>
+                            </div>
+                            <div class="ml-3 mt-1 flex-1 text-sm text-rose-800 font-medium">
+                                {{ session('error') }}
+                            </div>
+                            <div class="ml-auto pl-3 mt-1">
+                                <button @click="show = false" class="text-rose-500 hover:text-rose-600 transition-colors">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Here goes the content -->
+                    @hasSection('content')
+                        @yield('content')
+                    @else
+                        {{ $slot ?? '' }}
+                    @endif
+                </div>
             </main>
         </div>
-        
-        <!-- Bootstrap JavaScript -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        
-        <script>
-            // Handle logout with confirmation
-            document.addEventListener('DOMContentLoaded', function() {
-                // Handle logout form submission
-                const logoutForms = document.querySelectorAll('form[action*="logout"]');
-                
-                logoutForms.forEach(form => {
-                    form.addEventListener('submit', function(e) {
-                        e.preventDefault();
-                        
-                        Swal.fire({
-                            title: 'Are you sure?',
-                            text: 'You are about to log out of your account.',
-                            icon: 'question',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Yes, log me out',
-                            cancelButtonText: 'Cancel',
-                            reverseButtons: true
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                // Remove JWT token from localStorage if it exists
-                                if (typeof localStorage !== 'undefined') {
-                                    localStorage.removeItem('jwt_token');
-                                }
-                                // Submit the form
-                                this.submit();
+    </div>
+    
+    <script>
+        // Handle logout with confirmation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle logout form submission
+            const logoutForms = document.querySelectorAll('form[action*="logout"]');
+            
+            logoutForms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: 'You are about to log out of your account.',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, log me out',
+                        cancelButtonText: 'Cancel',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Remove JWT token from localStorage if it exists
+                            if (typeof localStorage !== 'undefined') {
+                                localStorage.removeItem('jwt_token');
                             }
-                        });
+                            // Submit the form
+                            this.submit();
+                        }
                     });
                 });
             });
-        </script>
+        });
 
-        <script>
-            // Clear any existing session storage
-            sessionStorage.clear();
-            
-            // Only run this for authenticated users
-            @if(auth()->check())
-            // Store current URL in session storage
-            sessionStorage.setItem('validSession', '1');
-            
-            // Prevent back button after logout
+        // Clear any existing session storage
+        sessionStorage.clear();
+        
+        // Store current URL in session storage
+        sessionStorage.setItem('validSession', '1');
+        
+        // Prevent back button after logout
+        window.history.pushState(null, null, window.location.href);
+        window.onpopstate = function() {
+            // If session is no longer valid, redirect to login
+            if (!sessionStorage.getItem('validSession')) {
+                window.location.href = '{{ route("login") }}';
+            }
             window.history.pushState(null, null, window.location.href);
-            window.onpopstate = function() {
-                // If session is no longer valid, redirect to login
-                if (!sessionStorage.getItem('validSession')) {
-                    window.location.href = '{{ route("login") }}';
-                }
-                window.history.pushState(null, null, window.location.href);
-            };
-            
-            // Clear session flag on page unload
-            window.addEventListener('beforeunload', function() {
-                // Don't clear if this is a form submission or link click
-                if (!event.target.href && !event.target.form) {
-                    sessionStorage.removeItem('validSession');
-                }
-            });
-            @endif
-        </script>
-    </body>
+        };
+        
+        // Clear session flag on page unload
+        window.addEventListener('beforeunload', function(event) {
+            // Don't clear if this is a form submission or link click
+            if (event.target && !event.target.href && !event.target.form) {
+                sessionStorage.removeItem('validSession');
+            }
+        });
+    </script>
+
+    @stack('scripts')
+</body>
 </html>

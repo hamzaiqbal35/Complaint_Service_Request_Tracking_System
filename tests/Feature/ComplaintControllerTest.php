@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\Complaint;
 use App\Models\Category;
+use App\Models\Complaint;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -29,27 +29,29 @@ class ComplaintControllerTest extends TestCase
     public function test_user_can_view_own_complaints()
     {
         $complaint = Complaint::factory()->create([
+            'title' => 'Short Test Title',
             'created_by' => $this->user->id,
-            'priority' => 'medium'
+            'priority' => 'medium',
         ]);
-        
+
         $this->actingAs($this->user)
-             ->get(route('complaints.index'))
-             ->assertStatus(200)
-             ->assertSee($complaint->title);
+            ->get(route('complaints.index'))
+            ->assertStatus(200)
+            ->assertSee($complaint->title);
     }
 
     public function test_admin_can_view_all_complaints()
     {
         $userComplaint = Complaint::factory()->create([
+            'title' => 'Admin Short Title',
             'created_by' => $this->user->id,
-            'priority' => 'medium'
+            'priority' => 'medium',
         ]);
-        
+
         $this->actingAs($this->admin)
-             ->get(route('admin.complaints.index'))
-             ->assertStatus(200)
-             ->assertSee($userComplaint->title);
+            ->get(route('admin.complaints.index'))
+            ->assertStatus(200)
+            ->assertSee($userComplaint->title);
     }
 
     public function test_user_can_create_complaint()
@@ -63,36 +65,39 @@ class ComplaintControllerTest extends TestCase
         ];
 
         $this->actingAs($this->user)
-             ->post(route('complaints.store'), $complaintData)
-             ->assertRedirect(route('complaints.index'));
+            ->post(route('complaints.store'), $complaintData)
+            ->assertRedirect(route('complaints.index'));
 
         $this->assertDatabaseHas('complaints', [
             'title' => 'Test Complaint',
             'created_by' => $this->user->id,
-            'priority' => 'high'
+            'priority' => 'high',
         ]);
     }
 
-    public function test_user_can_update_own_complaint()
+    public function test_user_can_withdraw_own_pending_complaint()
     {
         $complaint = Complaint::factory()->create([
             'created_by' => $this->user->id,
             'status' => 'pending',
-            'priority' => 'medium'
+            'priority' => 'medium',
         ]);
 
         $response = $this->actingAs($this->user)
-             ->patch(route('complaints.update', $complaint), [
-                 'status' => 'in_progress',
-                 'priority' => 'high',
-                 '_token' => csrf_token()
-             ]);
+            ->patch(route('complaints.update', $complaint), [
+                'status' => 'withdrawn',
+                '_token' => csrf_token(),
+            ]);
 
         $response->assertStatus(302);
         $this->assertDatabaseHas('complaints', [
             'id' => $complaint->id,
-            'status' => 'in_progress',
-            'priority' => 'high'
+            'status' => 'withdrawn',
+        ]);
+        
+        $this->assertDatabaseHas('complaint_logs', [
+            'complaint_id' => $complaint->id,
+            'action' => 'withdrawn',
         ]);
     }
 
@@ -102,24 +107,24 @@ class ComplaintControllerTest extends TestCase
             'created_by' => $this->user->id,
             'status' => 'pending',
             'priority' => 'medium',
-            'resolution' => null
+            'resolution' => null,
         ]);
 
         $response = $this->actingAs($this->admin)
-             ->patch(route('admin.complaints.update', $complaint), [
-                 'status' => 'resolved',
-                 'resolution' => 'Issue has been resolved',
-                 'priority' => 'high',
-                 '_token' => csrf_token()
-             ]);
+            ->patch(route('admin.complaints.update', $complaint), [
+                'status' => 'resolved',
+                'resolution' => 'Issue has been resolved',
+                'priority' => 'high',
+                '_token' => csrf_token(),
+            ]);
 
         $response->assertStatus(302);
-        
+
         $this->assertDatabaseHas('complaints', [
             'id' => $complaint->id,
             'status' => 'resolved',
             'resolution' => 'Issue has been resolved',
-            'priority' => 'high'
+            'priority' => 'high',
         ]);
     }
 
@@ -127,9 +132,9 @@ class ComplaintControllerTest extends TestCase
     {
         $complaint = Complaint::factory()->create([
             'created_by' => $this->user->id,
-            'priority' => 'medium'
+            'priority' => 'medium',
         ]);
-        
+
         // Since there's no delete route, we'll just test that the complaint exists
         $this->actingAs($this->user);
         $this->assertDatabaseHas('complaints', ['id' => $complaint->id]);
@@ -140,18 +145,18 @@ class ComplaintControllerTest extends TestCase
         $staff = User::factory()->create(['role' => 'staff']);
         $complaint = Complaint::factory()->create([
             'created_by' => $this->user->id,
-            'priority' => 'medium'
+            'priority' => 'medium',
         ]);
-        
+
         $this->actingAs($this->admin)
-             ->patch(route('admin.complaints.assign', $complaint), [
-                 'assigned_to' => $staff->id
-             ])
-             ->assertStatus(302);
+            ->patch(route('admin.complaints.assign', $complaint), [
+                'assigned_to' => $staff->id,
+            ])
+            ->assertStatus(302);
 
         $this->assertDatabaseHas('complaints', [
             'id' => $complaint->id,
-            'assigned_to' => $staff->id
+            'assigned_to' => $staff->id,
         ]);
     }
 }

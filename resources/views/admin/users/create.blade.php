@@ -1,100 +1,117 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
-        <h1 class="h3 mb-0 text-gray-800">Create New User</h1>
-        <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to Users
+<div class="container mx-auto px-4 py-8">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-3xl font-black text-slate-800 tracking-tight">Create New User</h1>
+            <p class="text-slate-500 mt-1">Add a new user to the system and assign their role.</p>
+        </div>
+        <a href="{{ route('admin.users.index') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 hover:text-teal-600 hover:border-teal-200 hover:bg-teal-50 rounded-xl font-medium transition-all shadow-sm">
+            <i class="fas fa-arrow-left text-sm"></i> Back to Users
         </a>
     </div>
 
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">User Information</h6>
+    <div class="max-w-4xl mx-auto">
+        <form method="POST" action="{{ route('admin.users.store') }}" class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 md:p-10 relative overflow-hidden">
+            <!-- Decorative blur -->
+            <div class="absolute top-0 right-0 w-64 h-64 bg-teal-500/5 rounded-full blur-3xl -z-10"></div>
+            
+            @csrf
+
+            <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center">
+                    <i class="fas fa-user-plus"></i>
                 </div>
-                <div class="card-body">
-                    <form method="POST" action="{{ route('admin.users.store') }}">
-                        @csrf
+                User Information
+            </h2>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                                       id="name" name="name" value="{{ old('name') }}" required>
-                                @error('name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <!-- Full Name -->
+                <div>
+                    <label for="name" class="block text-sm font-semibold text-slate-700 mb-2">Full Name <span class="text-rose-500">*</span></label>
+                    <input type="text" id="name" name="name" value="{{ old('name') }}" required
+                           class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-slate-700 bg-slate-50 focus:bg-white placeholder-slate-400 @error('name') border-rose-500 focus:ring-rose-500/20 focus:border-rose-500 @enderror"
+                           placeholder="John Doe">
+                    @error('name')
+                        <p class="mt-2 text-sm text-rose-500"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</p>
+                    @enderror
+                </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
-                                <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                                       id="email" name="email" value="{{ old('email') }}" required>
-                                @error('email')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block text-sm font-semibold text-slate-700 mb-2">Email Address <span class="text-rose-500">*</span></label>
+                    <input type="email" id="email" name="email" value="{{ old('email') }}" required
+                           class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-slate-700 bg-slate-50 focus:bg-white placeholder-slate-400 @error('email') border-rose-500 focus:ring-rose-500/20 focus:border-rose-500 @enderror"
+                           placeholder="john@example.com">
+                    @error('email')
+                        <p class="mt-2 text-sm text-rose-500"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label for="password" class="block text-sm font-semibold text-slate-700 mb-2">Password <span class="text-rose-500">*</span></label>
+                    <input type="password" id="password" name="password" required
+                           class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-slate-700 bg-slate-50 focus:bg-white @error('password') border-rose-500 focus:ring-rose-500/20 focus:border-rose-500 @enderror"
+                           placeholder="••••••••">
+                    @error('password')
+                        <p class="mt-2 text-sm text-rose-500"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Confirm Password -->
+                <div>
+                    <label for="password_confirmation" class="block text-sm font-semibold text-slate-700 mb-2">Confirm Password <span class="text-rose-500">*</span></label>
+                    <input type="password" id="password_confirmation" name="password_confirmation" required
+                           class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-slate-700 bg-slate-50 focus:bg-white"
+                           placeholder="••••••••">
+                </div>
+                
+                <!-- Role -->
+                <div class="md:col-span-2">
+                    <label for="role" class="block text-sm font-semibold text-slate-700 mb-2">Role <span class="text-rose-500">*</span></label>
+                    <div class="relative">
+                        <select id="role" name="role" required
+                                class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-slate-700 bg-slate-50 focus:bg-white appearance-none @error('role') border-rose-500 focus:ring-rose-500/20 focus:border-rose-500 @enderror">
+                            <option value="">Select Role</option>
+                            <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User</option>
+                            <option value="staff" {{ old('role') == 'staff' ? 'selected' : '' }}>Staff</option>
+                            <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                        </select>
+                        <!-- Custom select chevron -->
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                            <i class="fas fa-chevron-down text-sm"></i>
                         </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
-                                <input type="password" class="form-control @error('password') is-invalid @enderror" 
-                                       id="password" name="password" required>
-                                @error('password')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="password_confirmation" class="form-label">Confirm Password <span class="text-danger">*</span></label>
-                                <input type="password" class="form-control" 
-                                       id="password_confirmation" name="password_confirmation" required>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="role" class="form-label">Role <span class="text-danger">*</span></label>
-                                <select class="form-select @error('role') is-invalid @enderror" id="role" name="role" required>
-                                    <option value="">Select Role</option>
-                                    <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User</option>
-                                    <option value="staff" {{ old('role') == 'staff' ? 'selected' : '' }}>Staff</option>
-                                    <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                                </select>
-                                @error('role')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="alert alert-info">
-                                    <i class="fas fa-info-circle"></i>
-                                    <strong>Role Permissions:</strong>
-                                    <ul class="mb-0 mt-2">
-                                        <li><strong>User:</strong> Can create and view their own complaints</li>
-                                        <li><strong>Staff:</strong> Can view and manage assigned complaints</li>
-                                        <li><strong>Admin:</strong> Can manage all complaints, users, and system settings</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-end gap-2">
-                            <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Create User
-                            </button>
-                        </div>
-                    </form>
+                    </div>
+                    @error('role')
+                        <p class="mt-2 text-sm text-rose-500"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
-        </div>
+
+            <!-- Role Permissions Info -->
+            <div class="bg-blue-50/50 border border-blue-100 rounded-2xl p-5 mb-8">
+                <div class="flex items-start gap-3">
+                    <i class="fas fa-info-circle text-blue-500 mt-1"></i>
+                    <div>
+                        <h4 class="text-sm font-bold text-blue-900 mb-2">Role Permissions:</h4>
+                        <ul class="text-sm text-blue-800/80 space-y-1.5 list-disc list-inside">
+                            <li><strong class="text-blue-900">User:</strong> Can create and view their own complaints</li>
+                            <li><strong class="text-blue-900">Staff:</strong> Can view and manage assigned complaints</li>
+                            <li><strong class="text-blue-900">Admin:</strong> Can manage all complaints, users, and system settings</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-6 border-t border-slate-100">
+                <a href="{{ route('admin.users.index') }}" class="px-6 py-3 rounded-xl font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors">Cancel</a>
+                <button type="submit" class="px-6 py-3 rounded-xl font-medium text-white bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 transition-all shadow-md shadow-teal-500/20 flex items-center gap-2">
+                    <i class="fas fa-save"></i> Create User
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 @endsection

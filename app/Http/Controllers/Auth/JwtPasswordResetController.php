@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
-use Illuminate\Auth\Events\PasswordReset;
 
 class JwtPasswordResetController extends Controller
 {
@@ -30,12 +30,12 @@ class JwtPasswordResetController extends Controller
         if ($status == Password::RESET_LINK_SENT) {
             return response()->json([
                 'status' => 'success',
-                'message' => __($status)
+                'message' => __($status),
             ]);
         } else {
             return response()->json([
                 'status' => 'error',
-                'message' => __($status)
+                'message' => __($status),
             ], 400);
         }
     }
@@ -44,7 +44,7 @@ class JwtPasswordResetController extends Controller
     {
         return view('auth.jwt-reset-password', [
             'token' => $token,
-            'email' => $request->email
+            'email' => $request->email,
         ]);
     }
 
@@ -71,12 +71,12 @@ class JwtPasswordResetController extends Controller
         if ($status == Password::PASSWORD_RESET) {
             return response()->json([
                 'status' => 'success',
-                'message' => __($status)
+                'message' => __($status),
             ]);
         } else {
             return response()->json([
                 'status' => 'error',
-                'message' => __($status)
+                'message' => __($status),
             ], 400);
         }
     }

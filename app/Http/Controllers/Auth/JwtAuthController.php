@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class JwtAuthController extends Controller
 {
@@ -27,7 +27,7 @@ class JwtAuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         try {
-            if (!$token = JWTAuth::attempt($credentials)) {
+            if (! $token = JWTAuth::attempt($credentials)) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Invalid credentials',
@@ -42,7 +42,7 @@ class JwtAuthController extends Controller
 
         // Get the authenticated user
         $user = Auth::user();
-        
+
         // Return the token in the response body
         return response()->json([
             'status' => 'success',
@@ -53,8 +53,8 @@ class JwtAuthController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'role' => $user->role,
-            ]
-        ])->header('Authorization', 'Bearer ' . $token); // Also set in header for convenience
+            ],
+        ])->header('Authorization', 'Bearer '.$token); // Also set in header for convenience
     }
 
     public function register(Request $request)
@@ -86,7 +86,7 @@ class JwtAuthController extends Controller
             'authorization' => [
                 'token' => $token,
                 'type' => 'bearer',
-            ]
+            ],
         ], 201);
     }
 
@@ -95,7 +95,7 @@ class JwtAuthController extends Controller
         try {
             // Invalidate the current token
             auth()->logout(true); // Pass true to force the token to be blacklisted
-            
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Successfully logged out',
@@ -116,7 +116,7 @@ class JwtAuthController extends Controller
             'authorization' => [
                 'token' => Auth::refresh(),
                 'type' => 'bearer',
-            ]
+            ],
         ]);
     }
 

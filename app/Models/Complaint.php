@@ -13,17 +13,30 @@ class Complaint extends Model
 
     protected $fillable = [
         'category_id', 'created_by', 'assigned_to',
-        'title', 'description', 'priority', 'status', 'resolved_at',
+        'title', 'description', 'priority', 'status', 'resolution', 'resolved_at',
     ];
 
     protected $casts = [
         'resolved_at' => 'datetime',
     ];
 
-    public function category(): BelongsTo { return $this->belongsTo(Category::class); }
-    public function creator(): BelongsTo { return $this->belongsTo(User::class, 'created_by'); }
-    public function assignee(): BelongsTo { return $this->belongsTo(User::class, 'assigned_to'); }
-    public function logs(): HasMany { return $this->hasMany(ComplaintLog::class); }
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function assignee(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
+    }
+
+    public function logs(): HasMany
+    {
+        return $this->hasMany(ComplaintLog::class)->oldest();
+    }
 }
-
-

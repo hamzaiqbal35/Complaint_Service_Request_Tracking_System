@@ -17,6 +17,7 @@ return new class extends Migration
             $table->text('description');
             $table->enum('priority', ['low', 'medium', 'high'])->default('medium')->index();
             $table->enum('status', ['pending', 'in_progress', 'resolved', 'rejected'])->default('pending')->index();
+            $table->text('resolution')->nullable();
             $table->timestamp('resolved_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
@@ -29,5 +30,3 @@ return new class extends Migration
         Schema::dropIfExists('complaints');
     }
 };
-
-

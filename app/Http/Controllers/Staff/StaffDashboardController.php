@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Staff;
 
 use App\Http\Controllers\Controller;
-use App\Models\Complaint;
 use App\Models\Category;
+use App\Models\Complaint;
 use Illuminate\Http\Request;
 
 class StaffDashboardController extends Controller
@@ -38,7 +38,7 @@ class StaffDashboardController extends Controller
         // Apply sorting with whitelist and safe fallbacks
         $allowedSorts = ['id', 'created_at', 'title', 'priority', 'status'];
         $requestedSortBy = $request->get('sort_by');
-        $sortBy = in_array($requestedSortBy, $allowedSorts, true) && !empty($requestedSortBy)
+        $sortBy = in_array($requestedSortBy, $allowedSorts, true) && ! empty($requestedSortBy)
             ? $requestedSortBy
             : 'created_at';
         $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
@@ -48,7 +48,7 @@ class StaffDashboardController extends Controller
 
         // Get filtered statistics for assigned complaints
         $baseQuery = Complaint::where('assigned_to', auth()->id());
-        
+
         if ($request->filled('status')) {
             $baseQuery->where('status', $request->status);
         }
@@ -111,7 +111,7 @@ class StaffDashboardController extends Controller
         // Apply sorting consistent with index
         $allowedSorts = ['id', 'created_at', 'title', 'priority', 'status'];
         $requestedSortBy = $request->get('sort_by');
-        $sortBy = in_array($requestedSortBy, $allowedSorts, true) && !empty($requestedSortBy)
+        $sortBy = in_array($requestedSortBy, $allowedSorts, true) && ! empty($requestedSortBy)
             ? $requestedSortBy
             : 'created_at';
         $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
@@ -119,16 +119,16 @@ class StaffDashboardController extends Controller
 
         $complaints = $query->get();
 
-        $filename = 'staff_complaints_export_' . date('Y-m-d_H-i-s') . '.csv';
-        
+        $filename = 'staff_complaints_export_'.date('Y-m-d_H-i-s').'.csv';
+
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ];
 
-        $callback = function() use ($complaints) {
+        $callback = function () use ($complaints) {
             $file = fopen('php://output', 'w');
-            
+
             // Add CSV headers
             fputcsv($file, [
                 'ID',
@@ -139,7 +139,7 @@ class StaffDashboardController extends Controller
                 'Status',
                 'Created By',
                 'Created At',
-                'Updated At'
+                'Updated At',
             ]);
 
             // Add data rows
@@ -153,7 +153,7 @@ class StaffDashboardController extends Controller
                     ucfirst(str_replace('_', ' ', $complaint->status)),
                     $complaint->creator->name ?? 'N/A',
                     $complaint->created_at->format('Y-m-d H:i:s'),
-                    $complaint->updated_at->format('Y-m-d H:i:s')
+                    $complaint->updated_at->format('Y-m-d H:i:s'),
                 ]);
             }
 

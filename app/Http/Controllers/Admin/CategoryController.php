@@ -11,14 +11,19 @@ class CategoryController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Category::withCount('complaints');
+        $query = Category::withCount([
+            'complaints',
+            'complaints as unresolved_count' => function ($query) {
+                $query->whereNotIn('status', ['resolved', 'rejected']);
+            },
+        ]);
 
         // Apply filters
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -70,14 +75,14 @@ class CategoryController extends Controller
 
     public function show(Category $category)
     {
-        $category->load(['complaints' => function($query) {
+        $category->load(['complaints' => function ($query) {
             $query->with('creator', 'assignee')->latest()->limit(10);
         }]);
-        
+
         $complaintsCount = $category->complaints()->count();
         $pendingCount = $category->complaints()->where('status', 'pending')->count();
         $resolvedCount = $category->complaints()->where('status', 'resolved')->count();
-        
+
         return view('admin.categories.show', compact('category', 'complaintsCount', 'pendingCount', 'resolvedCount'));
     }
 
@@ -104,28 +109,36 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
-        // Check if category has complaints
-        if ($category->complaints()->exists()) {
+        $unresolvedCount = $category->complaints()->whereNotIn('status', ['resolved', 'rejected'])->count();
+
+        if ($unresolvedCount > 0) {
             return redirect()->route('admin.categories.index')
-                ->with('error', 'Cannot delete category with associated complaints.');
+                ->with('error', 'Cannot delete category with unresolved complaints.');
         }
 
+        // Delete all associated complaints first due to restrictOnDelete
+        $category->complaints()->delete();
         $category->delete();
 
         return redirect()->route('admin.categories.index')
-            ->with('success', 'Category deleted successfully.');
+            ->with('success', 'Category and its resolved/rejected complaints deleted successfully.');
     }
 
     public function export(Request $request)
     {
-        $query = Category::withCount('complaints');
+        $query = Category::withCount([
+            'complaints',
+            'complaints as unresolved_count' => function ($query) {
+                $query->whereNotIn('status', ['resolved', 'rejected']);
+            },
+        ]);
 
         // Apply same filters as index
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -139,16 +152,16 @@ class CategoryController extends Controller
 
         $categories = $query->get();
 
-        $filename = 'categories_export_' . date('Y-m-d_H-i-s') . '.csv';
-        
+        $filename = 'categories_export_'.date('Y-m-d_H-i-s').'.csv';
+
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ];
 
-        $callback = function() use ($categories) {
+        $callback = function () use ($categories) {
             $file = fopen('php://output', 'w');
-            
+
             // Add CSV headers
             fputcsv($file, [
                 'ID',
@@ -156,7 +169,7 @@ class CategoryController extends Controller
                 'Description',
                 'Total Complaints',
                 'Created At',
-                'Updated At'
+                'Updated At',
             ]);
 
             // Add data rows
@@ -167,7 +180,7 @@ class CategoryController extends Controller
                     $category->description ?? 'N/A',
                     $category->complaints_count,
                     $category->created_at->format('Y-m-d H:i:s'),
-                    $category->updated_at->format('Y-m-d H:i:s')
+                    $category->updated_at->format('Y-m-d H:i:s'),
                 ]);
             }
 

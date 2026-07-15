@@ -10,7 +10,7 @@ class ComplaintApiController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Complaint::with('category','creator','assignee');
+        $query = Complaint::with('category', 'creator', 'assignee');
 
         if ($request->user()->role === 'user') {
             $query->where('created_by', $request->user()->id);
@@ -23,15 +23,14 @@ class ComplaintApiController extends Controller
 
     public function show(Complaint $complaint, Request $request)
     {
-        $complaint->load('logs.user','category','assignee');
+        $complaint->load('logs.user', 'category', 'assignee');
         if ($request->user()->role === 'user' && $complaint->created_by !== $request->user()->id) {
             abort(403);
         }
         if ($request->user()->role === 'staff' && $complaint->assigned_to !== $request->user()->id) {
             abort(403);
         }
+
         return $complaint;
     }
 }
-
-

@@ -22,12 +22,10 @@ Route::controller(JwtPasswordResetController::class)->group(function () {
 });
 
 // Legacy API routes (keeping for compatibility)
-Route::post('/login', [AuthController::class,'login']);
+Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware(['auth:api'])->group(function () {
-    Route::post('/logout', [AuthController::class,'logout']);
-    Route::get('/complaints', [ComplaintApiController::class,'index']);
-    Route::get('/complaints/{complaint}', [ComplaintApiController::class,'show']);
+    // Route::post('/logout', [AuthController::class, 'logout']); // Conflicted with JWT logout
+    Route::get('/complaints', [ComplaintApiController::class, 'index']);
+    Route::get('/complaints/{complaint}', [ComplaintApiController::class, 'show']);
 });
-
-

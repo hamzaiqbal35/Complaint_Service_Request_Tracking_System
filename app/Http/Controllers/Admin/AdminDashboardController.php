@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Models\Category;
 use App\Models\Complaint;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -30,7 +30,7 @@ class AdminDashboardController extends Controller
             'in_progress' => (clone $baseQuery)->where('status', 'in_progress')->count(),
             'resolved' => (clone $baseQuery)->where('status', 'resolved')->count(),
             'rejected' => (clone $baseQuery)->where('status', 'rejected')->count(),
-            'unassigned' => (clone $baseQuery)->whereNull('assigned_to')->count()
+            'unassigned' => (clone $baseQuery)->whereNull('assigned_to')->count(),
         ];
 
         // Additional statistics
@@ -42,22 +42,22 @@ class AdminDashboardController extends Controller
                 ->where('priority', 'high')
                 ->where('status', 'pending')
                 ->count(),
-            'avg_resolution_time' => $this->calculateAverageResolutionTime()
+            'avg_resolution_time' => $this->calculateAverageResolutionTime(),
         ];
 
         // Query for complaints with filters and relationships
         $complaintsQuery = Complaint::with(['category', 'creator', 'assignee']);
-        
+
         // Apply same filters to complaints query
         $this->applyFilters($complaintsQuery, $request);
-        
+
         // Apply sorting
         $sortBy = $request->input('sort_by', 'created_at');
         $sortOrder = $request->input('sort_order', 'desc');
-        
+
         $complaints = $complaintsQuery->orderBy($sortBy, $sortOrder)
-                                    ->paginate(10)
-                                    ->appends($request->query());
+            ->paginate(10)
+            ->appends($request->query());
 
         return view('admin.dashboard', compact(
             'categories',
@@ -101,7 +101,7 @@ class AdminDashboardController extends Controller
         if ($request->filled('date_from')) {
             $query->whereDate('created_at', '>=', $request->date_from);
         }
-        
+
         if ($request->filled('date_to')) {
             $query->whereDate('created_at', '<=', $request->date_to);
         }
@@ -120,6 +120,7 @@ class AdminDashboardController extends Controller
         $totalHours = $resolvedComplaints->sum(function ($complaint) {
             $created = Carbon::parse($complaint->created_at);
             $resolved = Carbon::parse($complaint->resolved_at);
+
             return $created->diffInHours($resolved);
         });
 
@@ -140,14 +141,14 @@ class AdminDashboardController extends Controller
 
         $complaints = $complaintsQuery->orderBy($sortBy, $sortOrder)->get();
 
-        $csvFileName = 'complaints_' . date('Y-m-d_H-i-s') . '.csv';
+        $csvFileName = 'complaints_'.date('Y-m-d_H-i-s').'.csv';
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $csvFileName . '"',
+            'Content-Disposition' => 'attachment; filename="'.$csvFileName.'"',
         ];
 
         $handle = fopen('php://temp', 'r+');
-        
+
         // Add CSV headers
         fputcsv($handle, [
             'ID',
@@ -158,7 +159,7 @@ class AdminDashboardController extends Controller
             'Created By',
             'Assigned To',
             'Created At',
-            'Updated At'
+            'Updated At',
         ]);
 
         // Add data rows
@@ -172,7 +173,7 @@ class AdminDashboardController extends Controller
                 $complaint->creator->name ?? 'N/A',
                 $complaint->assignee->name ?? 'Unassigned',
                 $complaint->created_at,
-                $complaint->updated_at
+                $complaint->updated_at,
             ]);
         }
 

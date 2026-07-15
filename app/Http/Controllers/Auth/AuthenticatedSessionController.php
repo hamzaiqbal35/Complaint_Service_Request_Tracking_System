@@ -50,6 +50,7 @@ class AuthenticatedSessionController extends Controller
         if ($user->isStaff()) {
             return redirect()->intended(route('staff.dashboard', absolute: false));
         }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
@@ -71,46 +72,46 @@ class AuthenticatedSessionController extends Controller
 
             // Logout from all guards
             Auth::guard('web')->logout();
-            
+
             // Invalidate the session
             $request->session()->invalidate();
-            
+
             // Regenerate CSRF token
             $request->session()->regenerateToken();
-            
+
             // Clear all session data
             $request->session()->flush();
-            
+
             // Clear any cached authentication state
             if (isset($_SERVER['HTTP_COOKIE'])) {
                 $cookies = explode(';', $_SERVER['HTTP_COOKIE']);
-                foreach($cookies as $cookie) {
+                foreach ($cookies as $cookie) {
                     $parts = explode('=', $cookie);
                     $name = trim($parts[0]);
-                    if (strpos($name, 'XSRF-TOKEN') !== false || 
-                        strpos($name, 'laravel_session') !== false || 
+                    if (strpos($name, 'XSRF-TOKEN') !== false ||
+                        strpos($name, 'laravel_session') !== false ||
                         strpos($name, config('session.cookie')) !== false) {
                         setcookie($name, '', time() - 1000);
                         setcookie($name, '', time() - 1000, '/');
                     }
                 }
             }
-            
+
             // Redirect with cache control headers
             return redirect('/login')
                 ->with('status', 'You have been successfully logged out!')
                 ->header('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0')
                 ->header('Pragma', 'no-cache')
                 ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
-                
+
         } catch (\Exception $e) {
             // Log the error
-            \Log::error('Logout error: ' . $e->getMessage());
-            
+            \Log::error('Logout error: '.$e->getMessage());
+
             // Force logout and redirect even if there was an error
             Auth::guard('web')->logout();
             $request->session()->invalidate();
-            
+
             return redirect('/login')
                 ->with('error', 'There was an error during logout. You have been logged out for security.');
         }

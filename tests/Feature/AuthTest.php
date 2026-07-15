@@ -3,10 +3,10 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Auth\Notifications\ResetPassword;
 use Tests\TestCase;
 
 class AuthTest extends TestCase
@@ -27,7 +27,7 @@ class AuthTest extends TestCase
             'password' => 'password',
             'password_confirmation' => 'password',
             'phone' => '1234567890',
-            'role' => 'user'
+            'role' => 'user',
         ]);
 
         $this->assertAuthenticated();
@@ -35,7 +35,7 @@ class AuthTest extends TestCase
         $this->assertDatabaseHas('users', [
             'email' => 'test@example.com',
             'name' => 'Test User',
-            'role' => 'user'
+            'role' => 'user',
         ]);
     }
 
@@ -49,7 +49,7 @@ class AuthTest extends TestCase
     {
         $user = User::factory()->create([
             'password' => Hash::make('password'),
-            'role' => 'user'
+            'role' => 'user',
         ]);
 
         $response = $this->post('/login', [
@@ -65,7 +65,7 @@ class AuthTest extends TestCase
     {
         $staff = User::factory()->create([
             'password' => Hash::make('password'),
-            'role' => 'staff'
+            'role' => 'staff',
         ]);
 
         $response = $this->post('/login', [
@@ -117,6 +117,7 @@ class AuthTest extends TestCase
         Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
             $response = $this->get('/reset-password/'.$notification->token);
             $response->assertStatus(200);
+
             return true;
         });
     }
@@ -138,6 +139,7 @@ class AuthTest extends TestCase
             ]);
 
             $response->assertSessionHasNoErrors();
+
             return true;
         });
     }
@@ -149,6 +151,6 @@ class AuthTest extends TestCase
         $response = $this->actingAs($user)->post('/logout');
 
         $this->assertGuest();
-        $response->assertRedirect('/');
+        $response->assertRedirect('/login');
     }
 }

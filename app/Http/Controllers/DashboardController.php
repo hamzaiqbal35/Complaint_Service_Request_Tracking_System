@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Complaint;
 use App\Models\Category;
+use App\Models\Complaint;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class DashboardController extends Controller
 {
@@ -38,7 +37,7 @@ class DashboardController extends Controller
         // Apply sorting with whitelist and safe fallbacks
         $allowedSorts = ['id', 'created_at', 'title', 'priority', 'status'];
         $requestedSortBy = $request->get('sort_by');
-        $sortBy = in_array($requestedSortBy, $allowedSorts, true) && !empty($requestedSortBy)
+        $sortBy = in_array($requestedSortBy, $allowedSorts, true) && ! empty($requestedSortBy)
             ? $requestedSortBy
             : 'created_at';
         $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
@@ -48,7 +47,7 @@ class DashboardController extends Controller
 
         // Get filtered statistics
         $baseQuery = Complaint::where('created_by', auth()->id());
-        
+
         if ($request->filled('status')) {
             $baseQuery->where('status', $request->status);
         }
@@ -103,7 +102,7 @@ class DashboardController extends Controller
         // Apply sorting consistent with index
         $allowedSorts = ['id', 'created_at', 'title', 'priority', 'status'];
         $requestedSortBy = $request->get('sort_by');
-        $sortBy = in_array($requestedSortBy, $allowedSorts, true) && !empty($requestedSortBy)
+        $sortBy = in_array($requestedSortBy, $allowedSorts, true) && ! empty($requestedSortBy)
             ? $requestedSortBy
             : 'created_at';
         $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
@@ -111,16 +110,16 @@ class DashboardController extends Controller
 
         $complaints = $query->get();
 
-        $filename = 'complaints_export_' . date('Y-m-d_H-i-s') . '.csv';
-        
+        $filename = 'complaints_export_'.date('Y-m-d_H-i-s').'.csv';
+
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ];
 
-        $callback = function() use ($complaints) {
+        $callback = function () use ($complaints) {
             $file = fopen('php://output', 'w');
-            
+
             // Add CSV headers
             fputcsv($file, [
                 'ID',
@@ -131,7 +130,7 @@ class DashboardController extends Controller
                 'Status',
                 'Assigned To',
                 'Created At',
-                'Updated At'
+                'Updated At',
             ]);
 
             // Add data rows
@@ -145,7 +144,7 @@ class DashboardController extends Controller
                     ucfirst(str_replace('_', ' ', $complaint->status)),
                     $complaint->assignee->name ?? 'Unassigned',
                     $complaint->created_at->format('Y-m-d H:i:s'),
-                    $complaint->updated_at->format('Y-m-d H:i:s')
+                    $complaint->updated_at->format('Y-m-d H:i:s'),
                 ]);
             }
 

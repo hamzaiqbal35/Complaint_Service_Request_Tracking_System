@@ -2,10 +2,10 @@
 
 namespace Tests\Unit;
 
-use App\Models\Complaint;
-use App\Models\User;
 use App\Models\Category;
+use App\Models\Complaint;
 use App\Models\ComplaintLog;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -18,7 +18,7 @@ class ComplaintTest extends TestCase
         $user = User::factory()->create();
         $complaint = Complaint::factory()->create([
             'created_by' => $user->id,
-            'priority' => 'medium'
+            'priority' => 'medium',
         ]);
 
         $this->assertInstanceOf(User::class, $complaint->creator);
@@ -30,7 +30,7 @@ class ComplaintTest extends TestCase
         $category = Category::factory()->create();
         $complaint = Complaint::factory()->create([
             'category_id' => $category->id,
-            'priority' => 'medium'
+            'priority' => 'medium',
         ]);
 
         $this->assertInstanceOf(Category::class, $complaint->category);
@@ -43,9 +43,9 @@ class ComplaintTest extends TestCase
         $log = ComplaintLog::factory()->create([
             'complaint_id' => $complaint->id,
             'user_id' => User::factory()->create()->id,
-            'action' => 'status_update',
+            'action' => 'status_changed',
             'message' => 'Status updated',
-            'meta' => []
+            'meta' => [],
         ]);
 
         $this->assertTrue($complaint->logs->contains($log));
@@ -57,9 +57,9 @@ class ComplaintTest extends TestCase
     {
         $complaint = Complaint::factory()->create([
             'status' => 'pending',
-            'priority' => 'medium'
+            'priority' => 'medium',
         ]);
-        
+
         $complaint->update(['status' => 'in_progress']);
         $this->assertEquals('in_progress', $complaint->fresh()->status);
     }
@@ -69,7 +69,7 @@ class ComplaintTest extends TestCase
         $user = User::factory()->create(['role' => 'staff']);
         $complaint = Complaint::factory()->create([
             'assigned_to' => $user->id,
-            'priority' => 'medium'
+            'priority' => 'medium',
         ]);
 
         $this->assertInstanceOf(User::class, $complaint->assignee);

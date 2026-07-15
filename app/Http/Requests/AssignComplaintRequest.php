@@ -6,13 +6,15 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class AssignComplaintRequest extends FormRequest
 {
-    public function authorize(): bool { return auth()->check() && auth()->user()->isAdmin(); }
+    public function authorize(): bool
+    {
+        return auth()->check() && auth()->user()->isAdmin();
+    }
 
-    public function rules(): array {
+    public function rules(): array
+    {
         return [
-            'assigned_to' => ['nullable','exists:users,id'],
+            'assigned_to' => ['nullable', 'exists:users,id'],
         ];
     }
 }
-
-

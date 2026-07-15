@@ -1,652 +1,368 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="d-flex justify-content-between align-items-center">
-            <h2 class="fw-bold text-dark mb-0">
-                <i class="fas fa-tachometer-alt me-2 text-primary"></i>{{ __('Dashboard') }}
-            </h2>
-            <div class="d-flex gap-2">
-                <a href="{{ route('complaints.create') }}" class="btn btn-primary btn-modern">
-                    <i class="fas fa-plus me-2"></i>New Complaint
-                </a>
-            </div>
+<div x-data="{ filterOpen: {{ request()->hasAny(['status', 'priority', 'category_id', 'date_from', 'date_to', 'sort_by', 'sort_order']) ? 'true' : 'false' }} }">
+    
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-3xl font-black text-slate-800 tracking-tight">Overview</h1>
+            <p class="text-slate-500 mt-1">Welcome back, {{ Auth::user()->name }}! Here is what's happening today.</p>
         </div>
-    </x-slot>
-
-    <div class="py-4">
-        <div class="container-fluid">
-            <!-- Welcome Section -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="card border-0 shadow-sm bg-gradient-primary text-white">
-                        <div class="card-body p-4">
-                            <div class="row align-items-center">
-                                <div class="col-md-8">
-                                    <h3 class="fw-bold mb-2">Welcome back, {{ Auth::user()->name }}!</h3>
-                                    <p class="mb-0 opacity-75">Here's an overview of your complaint management activities.</p>
-                                </div>
-                                <div class="col-md-4 text-md-end">
-                                    <div class="d-inline-block bg-white bg-opacity-100 rounded-circle p-3">
-                                        <i class="fas fa-chart-line fa-2x"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Statistics Cards - Horizontal Layout -->
-            <div class="row g-4 mb-4">
-                <div class="col-xl-2 col-lg-3 col-md-6">
-                    <div class="card border-0 shadow-sm h-100 stats-card-modern">
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-shrink-0">
-                                    <div class="stats-icon bg-primary bg-opacity-10 text-primary rounded-3 p-3">
-                                        <i class="fas fa-file-alt fa-lg"></i>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <h6 class="text-muted mb-1 fw-semibold">Total Complaints</h6>
-                                    <h3 class="fw-bold text-dark mb-0">{{ $stats['total'] }}</h3>
-                                    <small class="text-success">
-                                        <i class="fas fa-arrow-up me-1"></i>12% from last month
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-2 col-lg-3 col-md-6">
-                    <div class="card border-0 shadow-sm h-100 stats-card-modern">
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-shrink-0">
-                                    <div class="stats-icon bg-warning bg-opacity-10 text-warning rounded-3 p-3">
-                                        <i class="fas fa-clock fa-lg"></i>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <h6 class="text-muted mb-1 fw-semibold">Pending</h6>
-                                    <h3 class="fw-bold text-dark mb-0">{{ $stats['pending'] }}</h3>
-                                    <small class="text-warning">
-                                        <i class="fas fa-exclamation-triangle me-1"></i>Needs attention
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-2 col-lg-3 col-md-6">
-                    <div class="card border-0 shadow-sm h-100 stats-card-modern">
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-shrink-0">
-                                    <div class="stats-icon bg-info bg-opacity-10 text-info rounded-3 p-3">
-                                        <i class="fas fa-cogs fa-lg"></i>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <h6 class="text-muted mb-1 fw-semibold">In Progress</h6>
-                                    <h3 class="fw-bold text-dark mb-0">{{ $stats['in_progress'] }}</h3>
-                                    <small class="text-info">
-                                        <i class="fas fa-spinner me-1"></i>Being processed
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-2 col-lg-3 col-md-6">
-                    <div class="card border-0 shadow-sm h-100 stats-card-modern">
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-shrink-0">
-                                    <div class="stats-icon bg-success bg-opacity-10 text-success rounded-3 p-3">
-                                        <i class="fas fa-check-circle fa-lg"></i>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <h6 class="text-muted mb-1 fw-semibold">Resolved</h6>
-                                    <h3 class="fw-bold text-dark mb-0">{{ $stats['resolved'] }}</h3>
-                                    <small class="text-success">
-                                        <i class="fas fa-arrow-up me-1"></i>85% success rate
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-2 col-lg-3 col-md-6">
-                    <div class="card border-0 shadow-sm h-100 stats-card-modern">
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-shrink-0">
-                                    <div class="stats-icon bg-danger bg-opacity-10 text-danger rounded-3 p-3">
-                                        <i class="fas fa-times-circle fa-lg"></i>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <h6 class="text-muted mb-1 fw-semibold">Rejected</h6>
-                                    <h3 class="fw-bold text-dark mb-0">{{ $stats['rejected'] }}</h3>
-                                    <small class="text-danger">
-                                        <i class="fas fa-arrow-down me-1"></i>5% of total
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-2 col-lg-3 col-md-6">
-                    <div class="card border-0 shadow-sm h-100 stats-card-modern">
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-shrink-0">
-                                    <div class="stats-icon bg-secondary bg-opacity-10 text-secondary rounded-3 p-3">
-                                        <i class="fas fa-chart-pie fa-lg"></i>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <h6 class="text-muted mb-1 fw-semibold">Resolution Rate</h6>
-                                    <h3 class="fw-bold text-dark mb-0">
-                                        {{ $stats['total'] > 0 ? round(($stats['resolved'] / $stats['total']) * 100) : 0 }}%
-                                    </h3>
-                                    <small class="text-success">
-                                        <i class="fas fa-trending-up me-1"></i>Excellent
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Actions & Recent Activity -->
-            <div class="row g-4 mb-4">
-                <div class="col-lg-8">
-                    <!-- Complaints Table -->
-                    <div class="card border-0 shadow-sm" x-data="{ open: (new URLSearchParams(window.location.search)).toString().length > 0 }">
-                        <div class="card-header bg-white border-0 py-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h5 class="fw-bold text-dark mb-0">
-                                    <i class="fas fa-list me-2 text-primary"></i>My Complaints
-                                </h5>
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-outline-secondary btn-sm" type="button" @click="open = !open" :aria-expanded="open.toString()" aria-controls="userFilterPanel">
-                                        <i class="fas fa-filter me-1"></i>Filter
-                                    </button>
-                                    <a href="{{ route('dashboard.export', request()->query()) }}" class="btn btn-outline-secondary btn-sm">
-                                        <i class="fas fa-download me-1"></i>Export
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Filter Form -->
-                        <div id="userFilterPanel" x-cloak x-show="open" x-transition>
-                            <div class="card-body border-bottom">
-                                <form method="GET" action="{{ route('dashboard') }}" class="row g-3">
-                                    <div class="col-md-3">
-                                        <label for="status" class="form-label">Status</label>
-                                        <select name="status" id="status" class="form-select rounded-3">
-                                            <option value="">All Statuses</option>
-                                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                                            <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                                            <option value="resolved" {{ request('status') == 'resolved' ? 'selected' : '' }}>Resolved</option>
-                                            <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label for="priority" class="form-label">Priority</label>
-                                        <select name="priority" id="priority" class="form-select rounded-3">
-                                            <option value="">All Priorities</option>
-                                            <option value="low" {{ request('priority') == 'low' ? 'selected' : '' }}>Low</option>
-                                            <option value="medium" {{ request('priority') == 'medium' ? 'selected' : '' }}>Medium</option>
-                                            <option value="high" {{ request('priority') == 'high' ? 'selected' : '' }}>High</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label for="category_id" class="form-label">Category</label>
-                                        <select name="category_id" id="category_id" class="form-select rounded-3">
-                                            <option value="">All Categories</option>
-                                            @foreach($categories as $category)
-                                                <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
-                                                    {{ $category->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label for="sort_by" class="form-label">Sort By</label>
-                                        <select name="sort_by" id="sort_by" class="form-select rounded-3">
-                                            <option value="created_at" {{ request('sort_by') == 'created_at' ? 'selected' : '' }}>Created Date</option>
-                                            <option value="title" {{ request('sort_by') == 'title' ? 'selected' : '' }}>Title</option>
-                                            <option value="priority" {{ request('sort_by') == 'priority' ? 'selected' : '' }}>Priority</option>
-                                            <option value="status" {{ request('sort_by') == 'status' ? 'selected' : '' }}>Status</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label for="date_from" class="form-label">From Date</label>
-                                        <input type="date" name="date_from" id="date_from" class="form-control rounded-3" value="{{ request('date_from') }}">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label for="date_to" class="form-label">To Date</label>
-                                        <input type="date" name="date_to" id="date_to" class="form-control rounded-3" value="{{ request('date_to') }}">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label for="sort_order" class="form-label">Sort Order</label>
-                                        <select name="sort_order" id="sort_order" class="form-select rounded-3">
-                                            <option value="desc" {{ request('sort_order') == 'desc' ? 'selected' : '' }}>Descending</option>
-                                            <option value="asc" {{ request('sort_order') == 'asc' ? 'selected' : '' }}>Ascending</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3 d-flex align-items-end">
-                                        <div class="d-flex gap-2 w-100">
-                                            <button type="submit" class="btn btn-primary flex-fill">
-                                                <i class="fas fa-search me-1"></i>Apply Filters
-                                            </button>
-                                            <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary">
-                                                <i class="fas fa-times"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                        
-                        <div class="card-body p-0">
-                            @if(session('success'))
-                                <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
-                                    <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                </div>
-                            @endif
-
-                            <div class="table-responsive">
-                                <table class="table table-hover mb-0">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th class="border-0 fw-semibold text-muted">ID</th>
-                                            <th class="border-0 fw-semibold text-muted">Title</th>
-                                            <th class="border-0 fw-semibold text-muted">Category</th>
-                                            <th class="border-0 fw-semibold text-muted">Priority</th>
-                                            <th class="border-0 fw-semibold text-muted">Status</th>
-                                            <th class="border-0 fw-semibold text-muted">Assigned To</th>
-                                            <th class="border-0 fw-semibold text-muted">Created</th>
-                                            <th class="border-0 fw-semibold text-muted">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($complaints as $complaint)
-                                            <tr class="complaint-row">
-                                                <td class="align-middle">
-                                                    <span class="badge bg-light text-dark">#{{ $complaint->id }}</span>
-                                                </td>
-                                                <td class="align-middle">
-                                                    <div>
-                                                        <div class="fw-semibold text-dark">{{ $complaint->title }}</div>
-                                                        <small class="text-muted">{{ Str::limit($complaint->description, 50) }}</small>
-                                                    </div>
-                                                </td>
-                                                <td class="align-middle">
-                                                    <span class="badge bg-primary bg-opacity-10 text-primary">
-                                                        {{ $complaint->category->name }}
-                                                    </span>
-                                                </td>
-                                                <td class="align-middle">
-                                                    <span class="badge 
-                                                        @if($complaint->priority === 'high') bg-danger/10 text-danger
-                                                        @elseif($complaint->priority === 'medium') bg-warning/10 text-warning
-                                                        @else bg-success/10 text-success
-                                                        @endif">
-                                                        <i class="fas fa-flag me-1"></i>{{ ucfirst($complaint->priority) }}
-                                                    </span>
-                                                </td>
-                                                <td class="align-middle">
-                                                    <span class="badge 
-                                                        @if($complaint->status === 'pending') bg-warning/10 text-warning
-                                                        @elseif($complaint->status === 'in_progress') bg-info/10 text-info
-                                                        @elseif($complaint->status === 'resolved') bg-success/10 text-success
-                                                        @else bg-danger/10 text-danger
-                                                        @endif">
-                                                        <i class="fas fa-circle me-1"></i>{{ ucfirst(str_replace('_', ' ', $complaint->status)) }}
-                                                    </span>
-                                                </td>
-                                                <td class="align-middle">
-                                                    <div class="d-flex align-items-center">
-                                                        @if($complaint->assignee)
-                                                            <div class="avatar-sm bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-2">
-                                                                {{ substr($complaint->assignee->name, 0, 1) }}
-                                                            </div>
-                                                            <span class="fw-medium">{{ $complaint->assignee->name }}</span>
-                                                        @else
-                                                            <span class="text-muted">Unassigned</span>
-                                                        @endif
-                                                    </div>
-                                                </td>
-                                                <td class="align-middle">
-                                                    <div>
-                                                        <div class="fw-medium">{{ $complaint->created_at->format('M d, Y') }}</div>
-                                                        <small class="text-muted">{{ $complaint->created_at->format('h:i A') }}</small>
-                                                    </div>
-                                                </td>
-                                                <td class="align-middle">
-                                                    <div class="btn-group" role="group">
-                                                        <a href="{{ route('complaints.show', $complaint) }}" 
-                                                           class="btn btn-sm btn-outline-primary" 
-                                                           data-bs-toggle="tooltip" 
-                                                           title="View Details">
-                                                            <i class="fas fa-eye"></i>
-                                                        </a>
-                                                        @if($complaint->status === 'pending')
-                                                            <button class="btn btn-sm btn-outline-warning" 
-                                                                    data-bs-toggle="tooltip" 
-                                                                    title="Edit">
-                                                                <i class="fas fa-edit"></i>
-                                                            </button>
-                                                        @endif
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="8" class="text-center py-5">
-                                                    <div class="empty-state">
-                                                        <div class="empty-state-icon bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                                                            <i class="fas fa-file-alt fa-2x text-muted"></i>
-                                                        </div>
-                                                        <h5 class="fw-bold text-dark mb-2">No complaints yet</h5>
-                                                        <p class="text-muted mb-4">Get started by creating your first complaint</p>
-                                                        <a href="{{ route('complaints.create') }}" class="btn btn-primary btn-modern">
-                                                            <i class="fas fa-plus me-2"></i>Create First Complaint
-                                                        </a>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            @if($complaints->hasPages())
-                                <div class="card-footer bg-white border-0 py-3">
-                                    <nav aria-label="Complaints pagination">
-                                        {{ $complaints->links() }}
-                                    </nav>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-4">
-                    <!-- Quick Actions -->
-                    <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-header bg-white border-0 py-3">
-                            <h5 class="fw-bold text-dark mb-0">
-                                <i class="fas fa-bolt me-2 text-warning"></i>Quick Actions
-                            </h5>
-                        </div>
-                        <div class="card-body p-3">
-                            <div class="d-grid gap-2">
-                                <a href="{{ route('complaints.create') }}" class="btn btn-primary btn-modern">
-                                    <i class="fas fa-plus me-2"></i>New Complaint
-                                </a>
-                                <a href="{{ route('complaints.index') }}" class="btn btn-outline-primary">
-                                    <i class="fas fa-list me-2"></i>View All Complaints
-                                </a>
-                                <a href="{{ route('profile.edit') }}" class="btn btn-outline-secondary">
-                                    <i class="fas fa-user-cog me-2"></i>Profile Settings
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Recent Activity -->
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-white border-0 py-3">
-                            <h5 class="fw-bold text-dark mb-0">
-                                <i class="fas fa-history me-2 text-info"></i>Recent Activity
-                            </h5>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="activity-timeline">
-                                @foreach($complaints->take(5) as $complaint)
-                                    <div class="activity-item p-3 border-bottom">
-                                        <div class="d-flex">
-                                            <div class="activity-icon bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                                                <i class="fas fa-file-alt"></i>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <div class="fw-semibold text-dark">{{ $complaint->title }}</div>
-                                                <div class="text-muted small">
-                                                    {{ $complaint->created_at->diffForHumans() }}
-                                                </div>
-                                                <span class="badge 
-                                                    @if($complaint->status === 'pending') bg-warning/10 text-warning
-                                                    @elseif($complaint->status === 'in_progress') bg-info/10 text-info
-                                                    @elseif($complaint->status === 'resolved') bg-success/10 text-success
-                                                    @else bg-danger/10 text-danger
-                                                    @endif">
-                                                    {{ ucfirst(str_replace('_', ' ', $complaint->status)) }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="flex items-center gap-3 w-full md:w-auto">
+            <button @click="filterOpen = !filterOpen" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50 hover:border-teal-300 transition-all font-medium shadow-sm">
+                <i class="fas fa-filter text-slate-400"></i> Filters
+            </button>
+            <a href="{{ route('complaints.create') }}" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl transition-all shadow-[0_8px_20px_-6px_rgba(16,185,129,0.4)] font-medium">
+                <i class="fas fa-plus"></i> New Complaint
+            </a>
+            <a href="{{ route('dashboard.export', request()->query()) }}" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl transition-all shadow-md font-medium">
+                <i class="fas fa-download"></i> Export
+            </a>
         </div>
     </div>
 
-    <style>
-        :root {
-            --primary-color: #0d9488;
-            --primary-dark: #0f766e;
-            --primary-light: #14b8a6;
-            --secondary-color: #059669;
-            --secondary-dark: #047857;
-            --secondary-light: #10b981;
-            --accent-color: #f59e0b;
-            --accent-dark: #d97706;
-            --accent-light: #fbbf24;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-            --dark-color: #1f2937;
-            --light-color: #f8fafc;
-            --gray-color: #6b7280;
-            --white-color: #ffffff;
-            
-            --primary-gradient: linear-gradient(135deg, #0d9488 0%, #059669 100%);
-            --secondary-gradient: linear-gradient(135deg, #14b8a6 0%, #10b981 100%);
-            --accent-gradient: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
-            --dark-gradient: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-            --hero-gradient: linear-gradient(135deg, #0d9488 0%, #059669 50%, #047857 100%);
-        }
+    <!-- Filter Panel -->
+    <div x-show="filterOpen" x-collapse x-cloak class="mb-8">
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+            <form method="GET" action="{{ route('dashboard') }}">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Status -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Status</label>
+                        <select name="status" class="w-full bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all appearance-none">
+                            <option value="">All Statuses</option>
+                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                            <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                            <option value="resolved" {{ request('status') == 'resolved' ? 'selected' : '' }}>Resolved</option>
+                            <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
+                            <option value="withdrawn" {{ request('status') == 'withdrawn' ? 'selected' : '' }}>Withdrawn</option>
+                        </select>
+                    </div>
+                    <!-- Priority -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Priority</label>
+                        <select name="priority" class="w-full bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all appearance-none">
+                            <option value="">All Priorities</option>
+                            <option value="low" {{ request('priority') == 'low' ? 'selected' : '' }}>Low</option>
+                            <option value="medium" {{ request('priority') == 'medium' ? 'selected' : '' }}>Medium</option>
+                            <option value="high" {{ request('priority') == 'high' ? 'selected' : '' }}>High</option>
+                        </select>
+                    </div>
+                    <!-- Category -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Category</label>
+                        <select name="category_id" class="w-full bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all appearance-none">
+                            <option value="">All Categories</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <!-- Sort By -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Sort By</label>
+                        <select name="sort_by" class="w-full bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all appearance-none">
+                            <option value="created_at" {{ request('sort_by') == 'created_at' ? 'selected' : '' }}>Created Date</option>
+                            <option value="title" {{ request('sort_by') == 'title' ? 'selected' : '' }}>Title</option>
+                            <option value="priority" {{ request('sort_by') == 'priority' ? 'selected' : '' }}>Priority</option>
+                            <option value="status" {{ request('sort_by') == 'status' ? 'selected' : '' }}>Status</option>
+                        </select>
+                    </div>
+                    <!-- Date Range -->
+                    <div class="grid grid-cols-2 gap-2 lg:col-span-2">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">From</label>
+                            <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}" class="w-full bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">To</label>
+                            <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}" class="w-full bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-sm">
+                        </div>
+                    </div>
+                    <!-- Sort Order -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Sort Order</label>
+                        <select name="sort_order" class="w-full bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all appearance-none">
+                            <option value="desc" {{ request('sort_order') == 'desc' ? 'selected' : '' }}>Descending</option>
+                            <option value="asc" {{ request('sort_order') == 'asc' ? 'selected' : '' }}>Ascending</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-3 mt-6 border-t border-slate-100 pt-6">
+                    <button type="submit" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl transition-all shadow-md font-medium">
+                        Apply Filters
+                    </button>
+                    <a href="{{ route('dashboard') }}" class="px-6 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-xl transition-all font-medium">
+                        Clear
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
 
-        .bg-gradient-primary {
-            background: var(--primary-gradient);
-        }
-
-        .stats-card-modern {
-            transition: all 0.3s ease;
-            border-radius: 12px;
-        }
-
-        .stats-card-modern:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(13, 148, 136, 0.1) !important;
-        }
-
-        .stats-icon {
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-modern {
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            border: none;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            border-radius: 8px;
-        }
-
-        .btn-modern::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn-modern:hover::before {
-            left: 100%;
-        }
-
-        .btn-modern:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(13, 148, 136, 0.15);
-        }
-
-        .btn-primary {
-            background: var(--primary-gradient);
-            border: none;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-
-        .btn-outline-primary {
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-        }
-
-        .btn-outline-primary:hover {
-            background: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-
-        .complaint-row {
-            transition: all 0.2s ease;
-        }
-
-        .complaint-row:hover {
-            background-color: rgba(13, 148, 136, 0.05);
-        }
-
-        .avatar-sm {
-            width: 32px;
-            height: 32px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .empty-state {
-            padding: 2rem 1rem;
-        }
-
-        .empty-state-icon {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        }
-
-        .activity-timeline .activity-item:last-child {
-            border-bottom: none !important;
-        }
-
-        .activity-timeline .activity-item {
-            transition: all 0.2s ease;
-        }
-
-        .activity-timeline .activity-item:hover {
-            background-color: rgba(13, 148, 136, 0.05);
-        }
-
-        .card {
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .table {
-            margin-bottom: 0;
-        }
-
-        .table th {
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .badge {
-            font-size: 0.75rem;
-            padding: 0.5em 0.75em;
-        }
-
-        @media (max-width: 768px) {
-            .stats-card-modern {
-                margin-bottom: 1rem;
-            }
-            
-            .table-responsive {
-                font-size: 0.875rem;
-            }
-        }
+    <!-- Bento Grid Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         
-        [x-cloak] { display: none !important; }
-    </style>
+        <!-- Primary Stat -->
+        <div class="bg-gradient-to-br from-teal-500 to-emerald-600 rounded-3xl p-6 shadow-[0_15px_40px_-10px_rgba(16,185,129,0.4)] relative overflow-hidden text-white group">
+            <div class="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+            <div class="relative z-10">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm border border-white/20">
+                        <i class="fas fa-clipboard-list text-xl"></i>
+                    </div>
+                </div>
+                <h3 class="text-white/80 font-medium mb-1">My Complaints</h3>
+                <div class="text-4xl font-black">{{ $stats['total'] }}</div>
+            </div>
+        </div>
 
-    <script>
-        // Wait for DOM and Bootstrap to be ready
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if Bootstrap is loaded
-            if (typeof bootstrap !== 'undefined') {
-                // Initialize tooltips
-                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                    return new bootstrap.Tooltip(tooltipTriggerEl)
-                });
+        <!-- Pending -->
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-md transition-shadow">
+            <div class="absolute right-0 top-0 w-32 h-32 bg-amber-500/5 rounded-full blur-3xl group-hover:bg-amber-500/10 transition-colors duration-500"></div>
+            <div class="flex justify-between items-start mb-4 relative z-10">
+                <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500 border border-amber-100">
+                    <i class="fas fa-clock text-xl"></i>
+                </div>
+            </div>
+            <h3 class="text-slate-500 font-medium mb-1 relative z-10">Pending</h3>
+            <div class="text-3xl font-black text-slate-800 relative z-10">{{ $stats['pending'] }}</div>
+        </div>
+
+        <!-- In Progress -->
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-md transition-shadow">
+            <div class="absolute right-0 top-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl group-hover:bg-blue-500/10 transition-colors duration-500"></div>
+            <div class="flex justify-between items-start mb-4 relative z-10">
+                <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 border border-blue-100">
+                    <i class="fas fa-spinner text-xl"></i>
+                </div>
+            </div>
+            <h3 class="text-slate-500 font-medium mb-1 relative z-10">In Progress</h3>
+            <div class="text-3xl font-black text-slate-800 relative z-10">{{ $stats['in_progress'] }}</div>
+        </div>
+
+        <!-- Resolved -->
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-md transition-shadow">
+            <div class="absolute right-0 top-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl group-hover:bg-emerald-500/10 transition-colors duration-500"></div>
+            <div class="flex justify-between items-start mb-4 relative z-10">
+                <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500 border border-emerald-100">
+                    <i class="fas fa-check-circle text-xl"></i>
+                </div>
+            </div>
+            <h3 class="text-slate-500 font-medium mb-1 relative z-10">Resolved</h3>
+            <div class="text-3xl font-black text-slate-800 relative z-10">{{ $stats['resolved'] }}</div>
+        </div>
+
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        
+        <!-- Complaints Table -->
+        <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
+            <div class="p-6 md:p-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">My Complaints</h2>
+                    <p class="text-sm text-slate-500 mt-1">Track the status of your reported issues.</p>
+                </div>
+                <a href="{{ route('complaints.index') }}" class="text-teal-600 hover:text-teal-700 font-medium text-sm flex items-center gap-1 group">
+                    View All <i class="fas fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+            <div class="overflow-x-auto flex-1">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50/50">
+                            <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">ID / Title</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">Category</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">Status</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">Date</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @forelse($complaints as $complaint)
+                            <tr class="hover:bg-slate-50/80 transition-colors group">
+                                <td class="px-6 py-4">
+                                    <div class="flex flex-col">
+                                        <span class="text-sm font-bold text-slate-800 group-hover:text-teal-600 transition-colors">{{ Str::limit($complaint->title, 40) }}</span>
+                                        <span class="text-xs text-slate-400 mt-0.5">#{{ $complaint->id }} • {{ Str::limit($complaint->description, 30) }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-xs font-medium">
+                                        <i class="fas fa-tag text-[10px] text-slate-400"></i>
+                                        {{ $complaint->category->name ?? 'N/A' }}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    @php
+                                        $statusColors = [
+                                            'resolved' => 'bg-emerald-50 text-emerald-600 border-emerald-200',
+                                            'in_progress' => 'bg-blue-50 text-blue-600 border-blue-200',
+                                            'rejected' => 'bg-rose-50 text-rose-600 border-rose-200',
+                                            'pending' => 'bg-amber-50 text-amber-600 border-amber-200'
+                                        ];
+                                        $colorClass = $statusColors[$complaint->status] ?? 'bg-slate-50 text-slate-600 border-slate-200';
+                                        
+                                        $priorityColors = [
+                                            'high' => 'text-rose-500',
+                                            'medium' => 'text-amber-500',
+                                            'low' => 'text-emerald-500'
+                                        ];
+                                        $pColor = $priorityColors[$complaint->priority] ?? 'text-slate-400';
+                                    @endphp
+                                    <div class="flex items-center gap-3">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border {{ $colorClass }}">
+                                            {{ ucfirst(str_replace('_', ' ', $complaint->status)) }}
+                                        </span>
+                                        <span class="text-xs font-bold uppercase tracking-wider {{ $pColor }}" title="Priority: {{ ucfirst($complaint->priority) }}">
+                                            <i class="fas {{ $complaint->priority == 'high' ? 'fa-arrow-up' : ($complaint->priority == 'low' ? 'fa-arrow-down' : 'fa-minus') }}"></i>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-sm text-slate-500 font-medium">{{ $complaint->created_at->format('M d, Y') }}</span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <a href="{{ route('complaints.show', $complaint) }}" class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-teal-600 hover:border-teal-200 hover:bg-teal-50 transition-all shadow-sm" title="View Details">
+                                            <i class="fas fa-eye text-sm"></i>
+                                        </a>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="px-6 py-12 text-center">
+                                    <div class="flex flex-col items-center justify-center text-slate-400">
+                                        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-100">
+                                            <i class="fas fa-file-alt text-2xl text-slate-300"></i>
+                                        </div>
+                                        <h3 class="text-lg font-bold text-slate-700 mb-1">No complaints found</h3>
+                                        <p class="text-sm font-medium mb-4">You haven't submitted any complaints that match this criteria.</p>
+                                        <a href="{{ route('complaints.create') }}" class="px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl transition-all shadow-md font-medium text-sm">
+                                            Create First Complaint
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="p-6 border-t border-slate-100">
+                {{ $complaints->links('pagination::tailwind') }}
+            </div>
+        </div>
+
+        <!-- Sidebar Activity & Actions -->
+        <div class="space-y-6">
+            <!-- Quick Actions -->
+            <div class="bg-slate-900 rounded-3xl shadow-[0_15px_40px_-10px_rgba(15,23,42,0.4)] border border-slate-800 p-6 relative overflow-hidden">
+                <div class="absolute right-[-20%] bottom-[-20%] w-48 h-48 bg-teal-500/10 rounded-full blur-3xl"></div>
+                <h2 class="text-lg font-bold text-white mb-6 relative z-10"><i class="fas fa-bolt text-amber-400 mr-2"></i> Quick Actions</h2>
+                <div class="flex flex-col gap-4 relative z-10">
+                    <a href="{{ route('complaints.create') }}" class="flex items-center gap-3 w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white hover:bg-slate-700 hover:border-slate-600 transition-colors group">
+                        <div class="w-10 h-10 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <span class="font-medium">New Complaint</span>
+                    </a>
+                    <a href="{{ route('complaints.index') }}" class="flex items-center gap-3 w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white transition-colors group">
+                        <div class="w-10 h-10 rounded-lg bg-slate-700/50 text-slate-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+                            <i class="fas fa-list"></i>
+                        </div>
+                        <span class="font-medium">View All Complaints</span>
+                    </a>
+                    <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white transition-colors group">
+                        <div class="w-10 h-10 rounded-lg bg-slate-700/50 text-slate-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+                            <i class="fas fa-user-cog"></i>
+                        </div>
+                        <span class="font-medium">Profile Settings</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
+                <h2 class="text-lg font-bold text-slate-800 mb-6"><i class="fas fa-history text-slate-400 mr-2"></i> Recent Activity</h2>
+                <div class="space-y-6">
+                    @foreach($complaints->take(4) as $complaint)
+                        <div class="flex gap-4 relative">
+                            @if(!$loop->last)
+                                <div class="absolute left-5 top-10 bottom-[-24px] w-px bg-slate-100"></div>
+                            @endif
+                            <div class="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center flex-shrink-0 z-10">
+                                @if($complaint->status === 'resolved')
+                                    <i class="fas fa-check text-emerald-500"></i>
+                                @elseif($complaint->status === 'in_progress')
+                                    <i class="fas fa-spinner text-blue-500"></i>
+                                @elseif($complaint->status === 'rejected')
+                                    <i class="fas fa-times text-rose-500"></i>
+                                @else
+                                    <i class="fas fa-clock text-amber-500"></i>
+                                @endif
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-slate-800">{{ Str::limit($complaint->title, 35) }}</p>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-xs text-slate-400">{{ $complaint->created_at->diffForHumans() }}</span>
+                                    <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+                                    <span class="text-xs font-medium 
+                                        @if($complaint->status === 'resolved') text-emerald-600
+                                        @elseif($complaint->status === 'in_progress') text-blue-600
+                                        @elseif($complaint->status === 'rejected') text-rose-600
+                                        @else text-amber-600
+                                        @endif">
+                                        {{ ucfirst(str_replace('_', ' ', $complaint->status)) }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                    
+                    @if($complaints->isEmpty())
+                        <div class="text-center py-4">
+                            <p class="text-sm text-slate-400 italic">No recent activity</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+@push('scripts')
+<script>
+document.addEventListener('alpine:init', () => {
+    const dateFrom = document.getElementById('date_from');
+    const dateTo = document.getElementById('date_to');
+    
+    if (dateFrom && dateTo) {
+        if (dateFrom.value) dateTo.min = dateFrom.value;
+        if (dateTo.value) dateFrom.max = dateTo.value;
+        
+        dateFrom.addEventListener('change', function() {
+            dateTo.min = this.value;
+            if (dateTo.value && dateTo.value < this.value) {
+                dateTo.value = this.value;
             }
         });
-
-        // Add animation to stats cards
-        document.addEventListener('DOMContentLoaded', function() {
-            const statsCards = document.querySelectorAll('.stats-card-modern');
-            
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach((entry, index) => {
-                    if (entry.isIntersecting) {
-                        setTimeout(() => {
-                            entry.target.style.opacity = '1';
-                            entry.target.style.transform = 'translateY(0)';
-                        }, index * 100);
-                    }
-                });
-            }, { threshold: 0.1 });
-
-            statsCards.forEach(card => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                card.style.transition = 'all 0.6s ease-out';
-                observer.observe(card);
-            });
+        dateTo.addEventListener('change', function() {
+            dateFrom.max = this.value;
+            if (dateFrom.value > this.value) {
+                dateFrom.value = this.value;
+            }
         });
-    </script>
+    }
+});
+</script>
+@endpush
 </x-app-layout>

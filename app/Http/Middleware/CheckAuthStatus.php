@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckAuthStatus
@@ -17,7 +16,7 @@ class CheckAuthStatus
         'register',
         'email/verify*',
         'jwt/*',
-        'api/*'
+        'api/*',
     ];
 
     public function handle(Request $request, Closure $next): Response
@@ -30,11 +29,11 @@ class CheckAuthStatus
         $response = $next($request);
 
         // If user is not authenticated and this is a GET request, redirect to login
-        if (!Auth::check() && $request->isMethod('get')) {
+        if (! Auth::check() && $request->isMethod('get')) {
             // Clear any existing session data
             $request->session()->invalidate();
             $request->session()->regenerateToken();
-            
+
             // Redirect to login with cache control headers
             return redirect()->route('login')
                 ->header('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0')
