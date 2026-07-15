@@ -1,59 +1,63 @@
 # Complaint & Service Request Tracking System
 
-A comprehensive Laravel-based complaint management system with authentication and role-based access control, featuring a modern UI.
+A comprehensive Laravel-based complaint management system with robust authentication, role-based access control, a sleek Alpine.js and Tailwind CSS UI, and real-time database notifications.
 
-## 🚀 Features
+## 🚀 Key Features
 
-### Authentication & Security
-- **Session-based Authentication**: Secure authentication with email verification
-- **Role-Based Access Control**: Three distinct user roles with granular permissions
-- **Password Management**: Secure password reset functionality
-- **Email Verification**: Required for all new accounts
+### 🔐 Authentication & Security
+- **Session-based Authentication**: Secure authentication with mandatory email verification.
+- **Role-Based Access Control (RBAC)**: Three distinct user roles (Admin, Staff, User) with granular boundaries and permissions.
+- **Password Management**: Secure password reset functionality and encrypted storage.
+- **Account Management**: Users can manage their own accounts and delete them. Admins have authority over all users.
 
-### User Roles & Access
+### 👥 User Roles & Access
 
 1. **Users** (`/dashboard`)
-   - Submit and track complaints
-   - View complaint history and status
-   - Withdraw pending complaints
-   - Update personal profile and manage account deletion
-   - Export complaint history
+   - Submit and track service requests / complaints.
+   - Withdraw pending complaints if they change their mind.
+   - View complaint timeline, assignments, and resolution status.
+   - Receive real-time notifications when their complaint status updates.
 
 2. **Staff** (`/staff/dashboard`)
-   - View and manage assigned complaints
-   - Update complaint status (strictly constrained to progressive states)
-   - Export complaint data
-   - View performance metrics
+   - View and manage specifically assigned complaints.
+   - Progressive state tracking (can only move from *Pending* -> *In Progress* -> *Resolved*).
+   - Export assigned complaint data to CSV/Excel.
+   - Receive notifications when assigned a new task.
 
 3. **Administrators** (`/admin/dashboard`)
-   - Manage all system users (including deleting accounts)
-   - Handle categories and departments
-   - View system analytics and reports
-   - Export user and complaint data
-   - Manage user email verification
-   - Full authority over complaint states (including rejecting)
+   - Complete oversight of the system via analytics and dashboard widgets.
+   - Manage all users (create, verify emails, delete accounts).
+   - Manage Categories and Departments.
+   - Absolute control over complaint states (assign to staff, reject, resolve, withdraw).
+   - Export all system data for reporting.
 
-### Core Functionality
-- **Complaint Management**: Full CRUD operations for complaints
-- **Strict Status Transitions**: Enforced logic for progressing complaints, with withdraw options for users
-- **Category Management**: Organize complaints by categories
-- **Search & Filters**: Advanced search with multiple filter options
-- **Data Export**: Export complaints and user data
-- **Activity Logs**: Track all important actions with full timeline visibility
+### 🔔 Notification System
+- **Real-Time Alerts**: Powered by Alpine.js and Laravel Database Notifications.
+- **Interactive Dropdown**: Notification bell in the navigation bar displaying unread badges and previews.
+- **Bulk Management**: Dedicated `/notifications` page to filter (Read/Unread), sort, and perform bulk actions (Mark as Read, Delete) on notifications.
+- **Context-Aware Routing**: Clicking a notification seamlessly directs you to the related complaint or user profile.
+
+### ⚙️ Core Functionality
+- **Complaint Management**: Full CRUD operations with detailed Activity Logs to track every status transition.
+- **Strict Status Transitions**: Built-in business logic enforcing state rules based on the user's role.
+- **Category Management**: Organize complaints dynamically by categories.
+- **Advanced Filtering**: Search, filter by status, priority, category, and date ranges.
 
 ## 🎨 UI/UX Features
-- Modern, responsive design with Tailwind CSS
-- Mobile-first approach for all devices
-- Intuitive dashboard for each user role
-- Clean and accessible interface
-- SweetAlert2 integration for critical confirmations (e.g., Logout, Account Deletion)
+- **Tailwind CSS Integration**: Modern, responsive, mobile-first design.
+- **Alpine.js Interactivity**: Used for dropdowns, modals, tabs, and dynamic state without heavy JS frameworks.
+- **Toastr Alerts**: Elegant, non-intrusive success and error notifications across all panels.
+- **SweetAlert2**: Beautiful confirmation dialogs for critical actions (Logout, Account Deletion).
+- Clean, unified dashboard layouts with a distinct Admin Panel aesthetic.
 
 ## 🛠️ Tech Stack
 - **Backend**: PHP 8.1+, Laravel 10.x/11.x
-- **Frontend**: HTML5, JavaScript, Tailwind CSS, Alpine.js, SweetAlert2
-- **Database**: SQLite / MySQL 8.0+
+- **Frontend**: Blade Templating, Tailwind CSS, Alpine.js, Toastr, SweetAlert2
+- **Database**: MySQL 8.0+ / SQLite
 - **Authentication**: Laravel Breeze
-- **Deployment**: Compatible with shared hosting
+- **Code Quality**: Enforced via Laravel Pint and automated PHPUnit tests.
+
+---
 
 ## 🚀 Getting Started
 
@@ -62,7 +66,7 @@ A comprehensive Laravel-based complaint management system with authentication an
 - Composer
 - Node.js & NPM
 - MySQL 8.0 or higher
-- Web server (Apache/Nginx)
+- Web server (Apache/Nginx/Laragon/Valet)
 
 ### Installation
 
@@ -81,7 +85,6 @@ A comprehensive Laravel-based complaint management system with authentication an
    ```bash
    npm install
    npm run build
-   npm run dev
    ```
 
 4. **Environment setup**
@@ -110,43 +113,40 @@ A comprehensive Laravel-based complaint management system with authentication an
    ```bash
    php artisan serve
    ```
+   *In a separate terminal, run `npm run dev` if you intend to modify frontend assets.*
 
 ## 🔑 Default Login Credentials
 
-After seeding, you can login with these credentials:
+After seeding the database, you can log in using these generated accounts:
 
 ### Admin User
-- **Email**: admin@example.com
-- **Password**: password
+- **Email**: `admin@example.com`
+- **Password**: `password`
 - **Role**: Admin
 
 ### Staff Users
-- **Email**: staff@example.com
-- **Password**: password
+- **Email**: `staff@example.com`
+- **Password**: `password`
 - **Role**: Staff
 
 ### Regular Users
-- **Email**: user@example.com
-- **Password**: password
+- **Email**: `user@example.com`
+- **Password**: `password`
 - **Role**: User
 
-##  Development Workflow
+---
 
-### Adding New Features
-1. **Create Migration**: `php artisan make:migration create_new_table`
-2. **Create Model**: `php artisan make:model NewModel`
-3. **Create Controller**: `php artisan make:controller NewController`
-4. **Add Routes**: Update `routes/web.php` or `routes/api.php`
-5. **Create Views**: Add Blade templates
-6. **Test**: Verify functionality
+## 🧪 Testing and Code Quality
 
-### Testing
+This project maintains high code quality and test coverage.
+To run the automated test suite:
 ```bash
-# Run tests
 php artisan test
+```
 
-# Run specific test
-php artisan test --filter TestName
+To automatically format the code using Laravel Pint:
+```bash
+vendor/bin/pint
 ```
 
 ## 📝 License
@@ -155,15 +155,7 @@ This project is open-source and available under the [MIT License](LICENSE).
 ## 📧 Contact
 For support, email [hamzaiqbalrajpoot35@gmail.com](mailto:hamzaiqbalrajpoot35@gmail.com)
 
-## 🎉 Conclusion
-
-This system provides a complete, modern complaint management solution with:
-- Role-based access control
-- Modern, responsive UI
-- Real-time statistics and tracking
-
 ---
-
 <div align="center">
-  Made with using Laravel, MySQL, Tailwind CSS & Bootstrap
+  Built with ❤️ using Laravel, Tailwind CSS, and Alpine.js
 </div>
