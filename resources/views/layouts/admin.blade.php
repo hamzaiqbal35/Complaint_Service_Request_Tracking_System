@@ -19,6 +19,11 @@
     <!-- AlpineJS for interactivity -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Toastr & jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     @stack('styles')
     
@@ -151,42 +156,6 @@
                 <div class="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-slate-100 to-slate-50 pointer-events-none"></div>
                 
                 <div class="relative max-w-7xl mx-auto">
-                    @if (session('success'))
-                        <div class="mb-6 rounded-2xl bg-emerald-50 border border-emerald-100 p-4 flex items-start shadow-sm" x-data="{ show: true }" x-show="show">
-                            <div class="flex-shrink-0 mt-0.5">
-                                <div class="w-8 h-8 rounded-full bg-emerald-100/50 flex items-center justify-center text-emerald-600">
-                                    <i class="fas fa-check-circle"></i>
-                                </div>
-                            </div>
-                            <div class="ml-3 mt-1 flex-1 text-sm text-emerald-800 font-medium">
-                                {{ session('success') }}
-                            </div>
-                            <div class="ml-auto pl-3 mt-1">
-                                <button @click="show = false" class="text-emerald-500 hover:text-emerald-600 transition-colors">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                    @endif
-
-                    @if (session('error'))
-                        <div class="mb-6 rounded-2xl bg-rose-50 border border-rose-100 p-4 flex items-start shadow-sm" x-data="{ show: true }" x-show="show">
-                            <div class="flex-shrink-0 mt-0.5">
-                                <div class="w-8 h-8 rounded-full bg-rose-100/50 flex items-center justify-center text-rose-600">
-                                    <i class="fas fa-exclamation-circle"></i>
-                                </div>
-                            </div>
-                            <div class="ml-3 mt-1 flex-1 text-sm text-rose-800 font-medium">
-                                {{ session('error') }}
-                            </div>
-                            <div class="ml-auto pl-3 mt-1">
-                                <button @click="show = false" class="text-rose-500 hover:text-rose-600 transition-colors">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                    @endif
-
                     <!-- Here goes the content -->
                     @yield('admin')
                     @yield('content')
@@ -196,6 +165,22 @@
     </div>
     
     <script>
+        // Toastr Configuration
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "timeOut": "4000",
+        };
+
+        @if(session('success'))
+            toastr.success("{{ session('success') }}");
+        @endif
+
+        @if(session('error'))
+            toastr.error("{{ session('error') }}");
+        @endif
+
         // Handle logout with confirmation
         document.addEventListener('DOMContentLoaded', function() {
             // Handle logout form submission
