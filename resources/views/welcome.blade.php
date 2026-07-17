@@ -55,6 +55,48 @@
         }
 
         /* ============================================
+           CUSTOM CURSOR
+           ============================================ */
+        body { cursor: none; }
+        a, button, input, textarea, select, .cursor-pointer, .bento-item, .feature-card, .faq-question { cursor: none; }
+        
+        .cursor-dot, .cursor-outline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--c-teal-light);
+            box-shadow: 0 0 10px var(--c-teal-light), 0 0 20px var(--c-teal);
+        }
+
+        .cursor-outline {
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(20, 184, 166, 0.5);
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+        }
+
+        .cursor-outline.hovering {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(20, 184, 166, 0.1);
+            border-color: rgba(20, 184, 166, 0.8);
+        }
+        
+        @media (max-width: 768px) {
+            body, a, button, input, textarea, select, .cursor-pointer, .bento-item, .feature-card, .faq-question { cursor: auto; }
+            .cursor-dot, .cursor-outline { display: none !important; }
+        }
+
+        /* ============================================
            RESET & BASE
            ============================================ */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -557,6 +599,7 @@
             padding: 60px 0;
             background: var(--c-off-white);
             border-bottom: 1px solid rgba(0,0,0,0.04);
+            overflow: hidden;
         }
 
         .trust-label {
@@ -569,12 +612,48 @@
             margin-bottom: 32px;
         }
 
+        .trust-logos-wrapper {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .trust-logos-wrapper::before,
+        .trust-logos-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 100px;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .trust-logos-wrapper::before {
+            left: 0;
+            background: linear-gradient(to right, var(--c-off-white) 0%, transparent 100%);
+        }
+
+        .trust-logos-wrapper::after {
+            right: 0;
+            background: linear-gradient(to left, var(--c-off-white) 0%, transparent 100%);
+        }
+
         .trust-logos {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 48px;
-            flex-wrap: wrap;
+            gap: 64px;
+            width: max-content;
+            animation: scrollLogos 25s linear infinite;
+        }
+
+        .trust-logos:hover {
+            animation-play-state: paused;
+        }
+
+        @keyframes scrollLogos {
+            from { transform: translateX(0); }
+            to { transform: translateX(calc(-50% - 32px)); }
         }
 
         .trust-logo {
@@ -1346,6 +1425,12 @@
 <body>
 
     <!-- ========================================
+         CUSTOM CURSOR
+         ======================================== -->
+    <div class="cursor-dot" id="cursor-dot"></div>
+    <div class="cursor-outline" id="cursor-outline"></div>
+
+    <!-- ========================================
          NAVBAR
          ======================================== -->
     <nav class="navbar" id="mainNavbar">
@@ -1397,6 +1482,7 @@
          HERO BENTO
          ======================================== -->
     <section class="hero-bento" id="hero">
+        <div id="tsparticles" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;"></div>
         <div class="container-xl">
             <div class="bento-grid">
                 <!-- Main Box -->
@@ -1464,14 +1550,22 @@
          TRUST / LOGOS
          ======================================== -->
     <section class="trust-section">
-        <div class="container-xl">
+        <div class="container-xl" style="position: relative;">
             <div class="trust-label reveal">Trusted by organizations worldwide</div>
-            <div class="trust-logos reveal">
-                <div class="trust-logo"><i class="fas fa-building"></i> Enterprise Co</div>
-                <div class="trust-logo"><i class="fas fa-university"></i> GovServices</div>
-                <div class="trust-logo"><i class="fas fa-hospital"></i> HealthCare+</div>
-                <div class="trust-logo"><i class="fas fa-graduation-cap"></i> EduTrust</div>
-                <div class="trust-logo"><i class="fas fa-shield-alt"></i> SecureOrg</div>
+            <div class="trust-logos-wrapper reveal">
+                <div class="trust-logos">
+                    <div class="trust-logo"><i class="fas fa-building"></i> Enterprise Co</div>
+                    <div class="trust-logo"><i class="fas fa-university"></i> GovServices</div>
+                    <div class="trust-logo"><i class="fas fa-hospital"></i> HealthCare+</div>
+                    <div class="trust-logo"><i class="fas fa-graduation-cap"></i> EduTrust</div>
+                    <div class="trust-logo"><i class="fas fa-shield-alt"></i> SecureOrg</div>
+                    <!-- Duplicate for infinite loop -->
+                    <div class="trust-logo"><i class="fas fa-building"></i> Enterprise Co</div>
+                    <div class="trust-logo"><i class="fas fa-university"></i> GovServices</div>
+                    <div class="trust-logo"><i class="fas fa-hospital"></i> HealthCare+</div>
+                    <div class="trust-logo"><i class="fas fa-graduation-cap"></i> EduTrust</div>
+                    <div class="trust-logo"><i class="fas fa-shield-alt"></i> SecureOrg</div>
+                </div>
             </div>
         </div>
     </section>
@@ -1942,6 +2036,108 @@
             });
         });
 
+    </script>
+    
+    <!-- ========================================
+         3D TILT & INTERACTIVE BACKGROUND
+         ======================================== -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
+    
+    <script>
+        // Custom Cursor Logic
+        const cursorDot = document.getElementById("cursor-dot");
+        const cursorOutline = document.getElementById("cursor-outline");
+        let cursorX = 0, cursorY = 0;
+        let outlineX = 0, outlineY = 0;
+
+        window.addEventListener("mousemove", (e) => {
+            cursorX = e.clientX;
+            cursorY = e.clientY;
+            if (cursorDot) {
+                cursorDot.style.left = cursorX + "px";
+                cursorDot.style.top = cursorY + "px";
+            }
+        });
+
+        function animateCursor() {
+            let distX = cursorX - outlineX;
+            let distY = cursorY - outlineY;
+            
+            outlineX = outlineX + (distX * 0.15);
+            outlineY = outlineY + (distY * 0.15);
+            
+            if (cursorOutline) {
+                cursorOutline.style.left = outlineX + "px";
+                cursorOutline.style.top = outlineY + "px";
+            }
+            
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        document.querySelectorAll("a, button, input, textarea, select, .cursor-pointer, .bento-item, .feature-card, .faq-question").forEach(el => {
+            el.addEventListener("mouseenter", () => {
+                if (cursorOutline) cursorOutline.classList.add("hovering");
+            });
+            el.addEventListener("mouseleave", () => {
+                if (cursorOutline) cursorOutline.classList.remove("hovering");
+            });
+        });
+
+        // Initialize Vanilla Tilt
+        if (typeof VanillaTilt !== 'undefined') {
+            VanillaTilt.init(document.querySelectorAll(".bento-item, .feature-card, .stat-card"), {
+                max: 5,
+                speed: 400,
+                glare: true,
+                "max-glare": 0.15,
+            });
+            VanillaTilt.init(document.querySelectorAll(".showcase-image"), {
+                max: 8,
+                speed: 400,
+                glare: false,
+            });
+        }
+
+        // Initialize tsParticles
+        if (typeof tsParticles !== 'undefined') {
+            tsParticles.load("tsparticles", {
+                fpsLimit: 60,
+                interactivity: {
+                    events: {
+                        onHover: { enable: true, mode: "grab" },
+                        resize: true,
+                    },
+                    modes: {
+                        grab: { distance: 200, links: { opacity: 0.5 } }
+                    },
+                },
+                particles: {
+                    color: { value: ["#0d9488", "#059669"] },
+                    links: {
+                        color: "#0d9488",
+                        distance: 150,
+                        enable: true,
+                        opacity: 0.2,
+                        width: 1,
+                    },
+                    move: {
+                        direction: "none",
+                        enable: true,
+                        outModes: { default: "bounce" },
+                        random: false,
+                        speed: 1,
+                        straight: false,
+                    },
+                    number: { density: { enable: true, area: 800 }, value: 40 },
+                    opacity: { value: 0.3 },
+                    shape: { type: "circle" },
+                    size: { value: { min: 1, max: 3 } },
+                },
+                detectRetina: true,
+            });
+        }
     </script>
 </body>
 </html>

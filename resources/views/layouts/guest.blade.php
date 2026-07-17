@@ -18,6 +18,9 @@
     </head>
     <body class="font-sans antialiased text-gray-900 bg-slate-900 selection:bg-teal-500 selection:text-white min-h-screen relative flex">
     
+    <!-- Custom Cursor -->
+    <div class="cursor-dot" id="cursor-dot"></div>
+    <div class="cursor-outline" id="cursor-outline"></div>
     <!-- Fixed Global Back Button (Top Left) -->
     <a href="/" class="fixed top-6 left-6 lg:top-8 lg:left-8 flex items-center gap-2 text-slate-400 hover:text-white transition-colors group z-50">
         <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 transition-colors">
@@ -28,8 +31,8 @@
 
     <!-- Left Side: Fixed branding & abstract illustration (Hidden on mobile) -->
     <div class="hidden lg:flex w-1/2 fixed inset-y-0 left-0 bg-slate-900 flex-col justify-center items-center overflow-hidden z-0">
-        <!-- Dot Grid Mesh Texture -->
-        <div class="absolute inset-0 z-0 opacity-30 pointer-events-none" style="background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1.5px, transparent 1.5px); background-size: 32px 32px;"></div>
+        <!-- Interactive Particles Background -->
+        <div id="tsparticles-guest" class="absolute inset-0 z-0 pointer-events-none"></div>
 
         <!-- Animated Background Orbs -->
         <div class="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-teal-600/20 blur-[100px] pointer-events-none"></div>
@@ -40,7 +43,7 @@
         <div class="relative z-10 w-3/4 max-w-lg text-center flex flex-col items-center">
             <div class="mb-12 animate-float">
                 <!-- Professional 3D Dashboard Mockup -->
-                <div class="w-full max-w-[340px] rounded-[2rem] bg-slate-800/80 border border-slate-700/50 backdrop-blur-3xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] p-6 transform rotate-[-4deg] hover:rotate-[0deg] hover:scale-105 transition-all duration-500 text-left">
+                <div id="mockup-card" class="w-full max-w-[340px] rounded-[2rem] bg-slate-800/80 border border-slate-700/50 backdrop-blur-3xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] p-6 transform rotate-[-4deg] hover:rotate-[0deg] hover:scale-105 transition-all duration-500 text-left">
                     
                     <!-- Card Header -->
                     <div class="flex justify-between items-center mb-6 border-b border-slate-700/50 pb-4">
@@ -128,6 +131,46 @@
             .animate-float {
                 animation: float 6s ease-in-out infinite;
             }
+
+            /* Custom Cursor */
+            body { cursor: none; }
+            a, button, input, textarea, select, .cursor-pointer { cursor: none; }
+            
+            .cursor-dot, .cursor-outline {
+                position: fixed;
+                top: 0;
+                left: 0;
+                transform: translate(-50%, -50%);
+                border-radius: 50%;
+                z-index: 9999;
+                pointer-events: none;
+            }
+
+            .cursor-dot {
+                width: 8px;
+                height: 8px;
+                background-color: #14b8a6; /* teal-400 */
+                box-shadow: 0 0 10px #14b8a6, 0 0 20px #0d9488;
+            }
+
+            .cursor-outline {
+                width: 40px;
+                height: 40px;
+                border: 2px solid rgba(20, 184, 166, 0.5);
+                transition: width 0.2s, height 0.2s, background-color 0.2s;
+            }
+
+            .cursor-outline.hovering {
+                width: 60px;
+                height: 60px;
+                background-color: rgba(20, 184, 166, 0.1);
+                border-color: rgba(20, 184, 166, 0.8);
+            }
+            
+            @media (max-width: 1024px) {
+                body, a, button, input, textarea, select, .cursor-pointer { cursor: auto; }
+                .cursor-dot, .cursor-outline { display: none !important; }
+            }
         </style>
     </div>
 
@@ -153,5 +196,103 @@
     </div>
     
     @stack('scripts')
+    
+    <!-- 3D Tilt & Interactive Background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
+    
+    <script>
+        // Custom Cursor Logic
+        const cursorDot = document.getElementById("cursor-dot");
+        const cursorOutline = document.getElementById("cursor-outline");
+        let cursorX = 0, cursorY = 0;
+        let outlineX = 0, outlineY = 0;
+
+        window.addEventListener("mousemove", (e) => {
+            cursorX = e.clientX;
+            cursorY = e.clientY;
+            if (cursorDot) {
+                cursorDot.style.left = cursorX + "px";
+                cursorDot.style.top = cursorY + "px";
+            }
+        });
+
+        function animateCursor() {
+            let distX = cursorX - outlineX;
+            let distY = cursorY - outlineY;
+            
+            outlineX = outlineX + (distX * 0.15);
+            outlineY = outlineY + (distY * 0.15);
+            
+            if (cursorOutline) {
+                cursorOutline.style.left = outlineX + "px";
+                cursorOutline.style.top = outlineY + "px";
+            }
+            
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        document.querySelectorAll("a, button, input, textarea, select, .cursor-pointer").forEach(el => {
+            el.addEventListener("mouseenter", () => {
+                if (cursorOutline) cursorOutline.classList.add("hovering");
+            });
+            el.addEventListener("mouseleave", () => {
+                if (cursorOutline) cursorOutline.classList.remove("hovering");
+            });
+        });
+
+        // Initialize Vanilla Tilt on Mockup
+        if (typeof VanillaTilt !== 'undefined') {
+            const mockup = document.getElementById("mockup-card");
+            if (mockup) {
+                VanillaTilt.init(mockup, {
+                    max: 10,
+                    speed: 400,
+                    glare: true,
+                    "max-glare": 0.2,
+                });
+            }
+        }
+
+        // Initialize tsParticles
+        if (typeof tsParticles !== 'undefined') {
+            tsParticles.load("tsparticles-guest", {
+                fpsLimit: 60,
+                interactivity: {
+                    events: {
+                        onHover: { enable: true, mode: "grab" },
+                        resize: true,
+                    },
+                    modes: {
+                        grab: { distance: 200, links: { opacity: 0.5 } }
+                    },
+                },
+                particles: {
+                    color: { value: ["#14b8a6", "#10b981"] },
+                    links: {
+                        color: "#14b8a6",
+                        distance: 150,
+                        enable: true,
+                        opacity: 0.2,
+                        width: 1,
+                    },
+                    move: {
+                        direction: "none",
+                        enable: true,
+                        outModes: { default: "bounce" },
+                        random: false,
+                        speed: 1,
+                        straight: false,
+                    },
+                    number: { density: { enable: true, area: 800 }, value: 40 },
+                    opacity: { value: 0.3 },
+                    shape: { type: "circle" },
+                    size: { value: { min: 1, max: 3 } },
+                },
+                detectRetina: true,
+            });
+        }
+    </script>
 </body>
 </html>
