@@ -16,6 +16,14 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/init-seeder', function () {
+    if (\App\Models\User::count() === 0) {
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+        return 'Database seeded successfully! You can now go to the login page and use admin@example.com / password.';
+    }
+    return 'Database is already seeded! This route has been deactivated for security.';
+});
+
 // Landing page remains public
 Route::get('/privacy-policy', function () { return view('pages.privacy-policy'); })->name('privacy.policy');
 Route::get('/terms-of-service', function () { return view('pages.terms-of-service'); })->name('terms.service');
