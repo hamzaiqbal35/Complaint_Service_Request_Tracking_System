@@ -2,7 +2,7 @@
 
 @section('content')
 <div x-data="{ 
-    filterOpen: {{ request()->hasAny(['role', 'search', 'sort_by', 'sort_order']) ? 'true' : 'false' }},
+    filterOpen: {{ request()->hasAny(['role', 'search', 'sort_by', 'sort_order', 'status']) ? 'true' : 'false' }},
     deleteModalOpen: false,
     userToDelete: null,
     userNameToDelete: '',
@@ -44,7 +44,16 @@
     <div x-show="filterOpen" x-collapse x-cloak class="mb-8">
         <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
             <form method="GET" action="{{ route('admin.users.index') }}">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <!-- Status -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Status</label>
+                        <select name="status" class="w-full bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all appearance-none">
+                            <option value="">All Statuses</option>
+                            <option value="verified" {{ request('status') == 'verified' ? 'selected' : '' }}>Verified</option>
+                            <option value="unverified" {{ request('status') == 'unverified' ? 'selected' : '' }}>Unverified</option>
+                        </select>
+                    </div>
                     <!-- Role -->
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Role</label>

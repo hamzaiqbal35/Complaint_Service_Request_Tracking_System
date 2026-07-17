@@ -6,9 +6,10 @@ A comprehensive Laravel-based complaint management system with robust authentica
 
 ### 🔐 Authentication & Security
 - **Session-based Authentication**: Secure authentication with mandatory email verification.
+- **SMTP Email Verification**: Built-in email verification system using Google's SMTP.
 - **Role-Based Access Control (RBAC)**: Three distinct user roles (Admin, Staff, User) with granular boundaries and permissions.
 - **Password Management**: Secure password reset functionality and encrypted storage.
-- **Account Management**: Users can manage their own accounts and delete them. Admins have authority over all users.
+- **Account Management**: Users can manage their own accounts and soft-delete them. Admins have authority over all users including managing soft deletes.
 
 ### 👥 User Roles & Access
 
@@ -99,17 +100,32 @@ A comprehensive Laravel-based complaint management system with robust authentica
    DB_CONNECTION=mysql
    DB_HOST=127.0.0.1
    DB_PORT=3306
-   DB_DATABASE=your_database
-   DB_USERNAME=your_username
-   DB_PASSWORD=your_password
+   DB_DATABASE=csrts
+   DB_USERNAME=root
+   DB_PASSWORD=
    ```
 
-6. **Run migrations and seeders**
+6. **Configure SMTP Email**
+   The application requires email capabilities to send Verification Links. Set up Gmail App Passwords:
+   - Go to Google Account -> Security -> 2-Step Verification.
+   - Generate an "App Password".
+   - Update your `.env` file with these credentials:
+   ```env
+   MAIL_MAILER=smtp
+   MAIL_HOST=smtp.gmail.com
+   MAIL_PORT=587
+   MAIL_USERNAME="your_email@gmail.com"
+   MAIL_PASSWORD="your_16_digit_app_password"
+   MAIL_ENCRYPTION=tls
+   MAIL_FROM_ADDRESS="your_email@gmail.com"
+   ```
+
+7. **Run migrations and seeders**
    ```bash
    php artisan migrate --seed
    ```
 
-7. **Start the development server**
+8. **Start the development server**
    ```bash
    php artisan serve
    ```

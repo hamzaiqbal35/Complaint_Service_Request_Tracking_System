@@ -29,10 +29,10 @@ class UserController extends Controller
         }
 
         if ($request->filled('status')) {
-            if ($request->status === 'active') {
-                $query->whereNull('email_verified_at');
-            } else {
+            if ($request->status === 'verified') {
                 $query->whereNotNull('email_verified_at');
+            } elseif ($request->status === 'unverified') {
+                $query->whereNull('email_verified_at');
             }
         }
 
@@ -130,6 +130,10 @@ class UserController extends Controller
             if ($user->id === auth()->id()) {
                 return back()->with('error', 'You cannot delete your own account.');
             }
+
+            // Append suffix to email to allow future re-registration
+            $user->email = $user->email . '::deleted_' . time();
+            $user->save();
 
             $user->delete();
 
