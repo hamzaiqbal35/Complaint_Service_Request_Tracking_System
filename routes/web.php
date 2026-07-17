@@ -17,11 +17,15 @@ Route::get('/', function () {
 });
 
 Route::get('/init-seeder', function () {
-    if (\App\Models\User::count() === 0) {
-        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
-        return 'Database seeded successfully! You can now go to the login page and use admin@example.com / password.';
+    try {
+        if (\App\Models\User::count() === 0) {
+            \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+            return 'Database seeded successfully! You can now go to the login page and use admin@example.com / password.';
+        }
+        return 'Database is already seeded! This route has been deactivated for security.';
+    } catch (\Exception $e) {
+        return 'Error during seeding: ' . $e->getMessage() . '<br><br><pre>' . $e->getTraceAsString() . '</pre>';
     }
-    return 'Database is already seeded! This route has been deactivated for security.';
 });
 
 // Landing page remains public
