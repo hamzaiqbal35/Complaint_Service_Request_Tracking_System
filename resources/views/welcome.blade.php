@@ -124,6 +124,11 @@
            ============================================ */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+        }
+
         html {
             scroll-behavior: smooth;
             -webkit-font-smoothing: antialiased;
@@ -134,7 +139,6 @@
             font-family: var(--font-body);
             color: var(--c-navy);
             background: var(--c-off-white);
-            overflow-x: hidden;
             line-height: 1.6;
         }
 
@@ -1354,10 +1358,27 @@
            RESPONSIVE
            ============================================ */
         @media (max-width: 1024px) {
-            .hero-grid {
+            .bento-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .bento-main, .bento-visual, .bento-stat {
+                grid-column: span 1;
+                grid-row: auto;
+            }
+
+            .bento-main {
                 text-align: center;
-                gap: 48px;
+                align-items: center;
+            }
+
+            .bento-visual {
+                min-height: 300px;
+            }
+
+            .bento-stat {
+                align-items: center;
+                text-align: center;
             }
 
             .hero-description { margin: 0 auto 40px; }
