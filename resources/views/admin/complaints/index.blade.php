@@ -1,7 +1,15 @@
 @extends('layouts.admin')
 
 @section('content')
-<div x-data="{ filterOpen: {{ request()->hasAny(['search', 'status', 'priority', 'category_id']) ? 'true' : 'false' }} }">
+<div x-data="{ 
+    filterOpen: {{ request()->hasAny(['search', 'status', 'priority', 'category_id']) ? 'true' : 'false' }},
+    selected: [],
+    selectAll: false,
+    pageIds: {{ json_encode($complaints->pluck('id')) }},
+    toggleAll() {
+        this.selected = this.selectAll ? [...this.pageIds] : [];
+    }
+}">
     <!-- Page Header -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
@@ -74,12 +82,43 @@
             </form>
         </div>
     </div>
+
+    <!-- Mass Actions Bar -->
+    <div x-show="selected.length > 0" x-collapse x-cloak class="mb-6 bg-teal-50 border border-teal-100 rounded-2xl p-4 shadow-sm flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-teal-200/50 text-teal-700 flex items-center justify-center font-bold">
+                <span x-text="selected.length"></span>
+            </div>
+            <span class="text-teal-800 font-medium">complaints selected</span>
+        </div>
+        <form action="{{ route('admin.complaints.bulk') }}" method="POST" class="flex flex-wrap items-center gap-2" id="bulk-action-form">
+            @csrf
+            <template x-for="id in selected" :key="id">
+                <input type="hidden" name="ids[]" :value="id">
+            </template>
+            <select name="action" class="bg-white border border-teal-200 text-teal-800 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none font-medium appearance-none min-w-[160px]" required>
+                <option value="">Choose action...</option>
+                <option value="pending">Mark as Pending</option>
+                <option value="in_progress">Mark as In Progress</option>
+                <option value="resolved">Mark as Resolved</option>
+                <option value="rejected">Mark as Rejected</option>
+                <option value="delete">Delete Selected</option>
+            </select>
+            <button type="submit" class="px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-medium transition-all shadow-sm" onclick="return confirm('Are you sure you want to perform this action on selected items?')">
+                Apply Action
+            </button>
+        </form>
+    </div>
+
     <!-- Data Table -->
     <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-slate-50/50">
+                        <th class="px-6 py-4 w-12 border-b border-slate-100">
+                            <input type="checkbox" x-model="selectAll" @change="toggleAll" class="w-4 h-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500/30 transition-all cursor-pointer">
+                        </th>
                         <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">ID / Title</th>
                         <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">Category</th>
                         <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">Status</th>
@@ -89,7 +128,10 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                     @forelse($complaints as $complaint)
-                        <tr class="hover:bg-slate-50/80 transition-colors group">
+                        <tr class="hover:bg-slate-50/80 transition-colors group" :class="{ 'bg-teal-50/30': selected.includes({{ $complaint->id }}) }">
+                            <td class="px-6 py-4">
+                                <input type="checkbox" x-model="selected" value="{{ $complaint->id }}" class="w-4 h-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500/30 transition-all cursor-pointer">
+                            </td>
                             <td class="px-6 py-4">
                                 <div class="flex flex-col">
                                     <span class="text-sm font-bold text-slate-800 group-hover:text-teal-600 transition-colors">{{ Str::limit($complaint->title, 40) }}</span>
@@ -155,7 +197,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-12 text-center">
+                            <td colspan="6" class="px-6 py-12 text-center">
                                 <div class="flex flex-col items-center justify-center text-slate-400">
                                     <i class="fas fa-inbox text-4xl mb-3 text-slate-300"></i>
                                     <p class="text-sm font-medium">No complaints found.</p>

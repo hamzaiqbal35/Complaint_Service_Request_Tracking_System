@@ -598,6 +598,14 @@
             margin-bottom: 40px;
             max-width: 600px;
         }
+        .typing-cursor {
+            color: var(--c-teal);
+            font-weight: 300;
+            animation: blink 1s step-start infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
         .hero-actions {
             display: flex;
             gap: 16px;
@@ -1522,7 +1530,7 @@
                     </div>
                     <h1 class="hero-title">
                         Resolve Issues<br>
-                        <span class="gradient-text">Faster & Smarter</span>
+                        <span class="gradient-text" id="typewriter">Faster & Smarter</span><span class="typing-cursor">|</span>
                     </h1>
                     <p class="hero-description">
                         The all-in-one platform to submit, track, and resolve complaints with real-time
@@ -2097,6 +2105,41 @@
             requestAnimationFrame(animateCursor);
         }
         animateCursor();
+
+        // Typewriter Effect
+        const phrases = ["Faster & Smarter", "With Full Transparency", "In Record Time", "Without the Hassle"];
+        let currentPhraseIndex = 0;
+        let currentCharIndex = 0;
+        let isDeleting = false;
+        const typewriterElement = document.getElementById('typewriter');
+        
+        function type() {
+            if (!typewriterElement) return;
+            const currentPhrase = phrases[currentPhraseIndex];
+            
+            if (isDeleting) {
+                typewriterElement.textContent = currentPhrase.substring(0, currentCharIndex - 1);
+                currentCharIndex--;
+            } else {
+                typewriterElement.textContent = currentPhrase.substring(0, currentCharIndex + 1);
+                currentCharIndex++;
+            }
+            
+            let typeSpeed = isDeleting ? 50 : 100;
+            
+            if (!isDeleting && currentCharIndex === currentPhrase.length) {
+                typeSpeed = 2000; // Pause at end of phrase
+                isDeleting = true;
+            } else if (isDeleting && currentCharIndex === 0) {
+                isDeleting = false;
+                currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length;
+                typeSpeed = 500; // Pause before typing next phrase
+            }
+            
+            setTimeout(type, typeSpeed);
+        }
+        
+        setTimeout(type, 1000); // Initial delay
 
         document.querySelectorAll("a, button, input, textarea, select, .cursor-pointer, .bento-item, .feature-card, .faq-question").forEach(el => {
             el.addEventListener("mouseenter", () => {

@@ -48,9 +48,37 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
-        Auth::logout();
+        \Illuminate\Support\Facades\DB::transaction(function () use ($user) {
+            // Withdraw active complaints
+            $activeComplaints = $user->complaints()->whereIn('status', ['pending', 'in_progress'])->get();
+            foreach ($activeComplaints as $complaint) {
+                $complaint->update(['status' => 'withdrawn']);
+                
+                \App\Models\ComplaintLog::create([
+                    'complaint_id' => $complaint->id,
+                    'user_id' => $user->id,
+                    'action' => 'withdrawn',
+                    'message' => 'Withdrawn due to account closure.',
+                    'meta' => ['auto_withdrawn' => true]
+                ]);
 
-        $user->delete();
+                $admins = \App\Models\User::where('role', 'admin')->get();
+                \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\ComplaintWithdrawn($complaint));
+
+                if ($complaint->assignee) {
+                    $complaint->assignee->notify(new \App\Notifications\ComplaintWithdrawn($complaint));
+                }
+            }
+
+            // Append suffix to email to allow future re-registration
+            $user->email = $user->email . '::deleted_' . time();
+            $user->save();
+
+            // Soft delete the user
+            $user->delete();
+        });
+
+        Auth::logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

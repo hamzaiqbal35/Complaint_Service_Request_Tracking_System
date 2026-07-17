@@ -7,7 +7,7 @@
             Delete Account
         </h2>
         <p class="mt-3 text-sm text-slate-400 max-w-xl">
-            Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.
+            Deleting your account means your profile will no longer be accessible and active complaints will be withdrawn. Resolved and historical complaints will remain in our records for audit purposes. This action cannot be undone.
         </p>
     </header>
 
@@ -27,7 +27,13 @@
             </h2>
 
             <p class="mt-3 text-sm text-slate-600">
-                Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.
+                <ul class="list-disc pl-5 mb-4 text-sm text-slate-600 space-y-1">
+                    <li>Your profile will no longer be accessible.</li>
+                    <li>Pending and In-Progress complaints will be automatically withdrawn.</li>
+                    <li>Resolved, rejected, and withdrawn complaints will remain in our records for legal and audit purposes.</li>
+                    <li>Your account will be deactivated and closed.</li>
+                </ul>
+                Please enter your password to confirm you would like to permanently close your account.
             </p>
 
             <div class="mt-6" x-data="{ showPassword: false }">

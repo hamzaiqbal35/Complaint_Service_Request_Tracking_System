@@ -27,6 +27,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('role:user')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard/export', [DashboardController::class, 'export'])->name('dashboard.export');
+        Route::post('complaints/bulk', [ComplaintController::class, 'bulkAction'])->name('complaints.bulk');
         Route::resource('complaints', ComplaintController::class)->only(['index', 'create', 'store', 'show', 'update']);
     });
 
@@ -35,6 +36,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('dashboard', [StaffDashboardController::class, 'index'])->name('dashboard');
         Route::get('dashboard/export', [StaffDashboardController::class, 'export'])->name('dashboard.export');
         Route::get('complaints', [StaffComplaintController::class, 'index'])->name('complaints.index');
+        Route::post('complaints/bulk', [StaffComplaintController::class, 'bulkAction'])->name('complaints.bulk');
         Route::get('complaints/{complaint}', [StaffComplaintController::class, 'show'])->name('complaints.show');
         Route::patch('complaints/{complaint}/status', [StaffComplaintController::class, 'updateStatus'])->name('complaints.update-status');
     });
@@ -47,6 +49,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
             Route::get('dashboard/export', [AdminDashboardController::class, 'export'])->name('dashboard.export');
             Route::get('complaints', [ComplaintAdminController::class, 'index'])->name('complaints.index');
+            Route::post('complaints/bulk', [ComplaintAdminController::class, 'bulkAction'])->name('complaints.bulk');
             Route::get('complaints/{complaint}', [ComplaintAdminController::class, 'show'])->name('complaints.show');
             Route::get('complaints/{complaint}/edit', [ComplaintAdminController::class, 'edit'])->name('complaints.edit');
             Route::patch('complaints/{complaint}/assign', [ComplaintAdminController::class, 'assign'])->name('complaints.assign');
@@ -56,6 +59,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // User Management
             Route::prefix('users')->name('users.')->group(function () {
                 Route::get('export', [UserController::class, 'export'])->name('export');
+                Route::post('bulk', [UserController::class, 'bulkAction'])->name('bulk');
 
                 // Define routes individually for better control
                 Route::get('', [UserController::class, 'index'])->name('index');
@@ -74,6 +78,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // Define the custom export route BEFORE the resource route to avoid conflicts
             Route::get('categories/export', [CategoryController::class, 'export'])
                 ->name('categories.export');
+            Route::post('categories/bulk', [CategoryController::class, 'bulkAction'])->name('categories.bulk');
             Route::resource('categories', CategoryController::class);
         });
     });

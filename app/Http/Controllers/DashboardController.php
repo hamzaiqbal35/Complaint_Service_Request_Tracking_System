@@ -70,11 +70,41 @@ class DashboardController extends Controller
             'in_progress' => (clone $baseQuery)->where('status', 'in_progress')->count(),
             'resolved' => (clone $baseQuery)->where('status', 'resolved')->count(),
             'rejected' => (clone $baseQuery)->where('status', 'rejected')->count(),
+            'withdrawn' => (clone $baseQuery)->where('status', 'withdrawn')->count(),
         ];
+
+        // Chart Data
+        $chartData = [
+            'pie' => [
+                'pending' => $stats['pending'],
+                'in_progress' => $stats['in_progress'],
+                'resolved' => $stats['resolved'],
+                'rejected' => $stats['rejected'],
+                'withdrawn' => $stats['withdrawn'],
+            ],
+            'line' => [
+                'labels' => [],
+                'data' => []
+            ]
+        ];
+
+        $thirtyDaysAgo = \Carbon\Carbon::now()->subDays(29)->startOfDay();
+        $dailyCounts = (clone $baseQuery)
+            ->where('created_at', '>=', $thirtyDaysAgo)
+            ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->pluck('count', 'date');
+
+        for ($i = 29; $i >= 0; $i--) {
+            $date = \Carbon\Carbon::now()->subDays($i)->format('Y-m-d');
+            $chartData['line']['labels'][] = \Carbon\Carbon::now()->subDays($i)->format('M d');
+            $chartData['line']['data'][] = $dailyCounts->get($date, 0);
+        }
 
         $categories = Category::all();
 
-        return view('dashboard', compact('complaints', 'stats', 'categories'));
+        return view('dashboard', compact('complaints', 'stats', 'categories', 'chartData'));
     }
 
     public function export(Request $request)

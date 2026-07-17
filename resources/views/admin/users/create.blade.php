@@ -50,22 +50,32 @@
                 </div>
 
                 <!-- Password -->
-                <div>
+                <div x-data="{ show: false }">
                     <label for="password" class="block text-sm font-semibold text-slate-700 mb-2">Password <span class="text-rose-500">*</span></label>
-                    <input type="password" id="password" name="password" required
-                           class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-slate-700 bg-slate-50 focus:bg-white @error('password') border-rose-500 focus:ring-rose-500/20 focus:border-rose-500 @enderror"
-                           placeholder="••••••••">
+                    <div class="relative">
+                        <input x-bind:type="show ? 'text' : 'password'" id="password" name="password" required
+                               class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-slate-700 bg-slate-50 focus:bg-white placeholder-slate-400 pr-12 @error('password') border-rose-500 focus:ring-rose-500/20 focus:border-rose-500 @enderror"
+                               placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢">
+                        <button type="button" @click="show = !show" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-teal-600 focus:outline-none transition-colors">
+                            <i class="fas fa-fw" :class="show ? 'fa-eye-slash' : 'fa-eye'"></i>
+                        </button>
+                    </div>
                     @error('password')
                         <p class="mt-2 text-sm text-rose-500"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Confirm Password -->
-                <div>
+                <div x-data="{ show: false }">
                     <label for="password_confirmation" class="block text-sm font-semibold text-slate-700 mb-2">Confirm Password <span class="text-rose-500">*</span></label>
-                    <input type="password" id="password_confirmation" name="password_confirmation" required
-                           class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-slate-700 bg-slate-50 focus:bg-white"
-                           placeholder="••••••••">
+                    <div class="relative">
+                        <input x-bind:type="show ? 'text' : 'password'" id="password_confirmation" name="password_confirmation" required
+                               class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-slate-700 bg-slate-50 focus:bg-white placeholder-slate-400 pr-12"
+                               placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢">
+                        <button type="button" @click="show = !show" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-teal-600 focus:outline-none transition-colors">
+                            <i class="fas fa-fw" :class="show ? 'fa-eye-slash' : 'fa-eye'"></i>
+                        </button>
+                    </div>
                 </div>
                 
                 <!-- Role -->

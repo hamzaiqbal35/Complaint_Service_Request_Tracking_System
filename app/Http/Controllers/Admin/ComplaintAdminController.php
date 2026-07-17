@@ -106,10 +106,12 @@ class ComplaintAdminController extends Controller
             'meta' => ['from' => $from, 'to' => $complaint->status],
         ]);
 
-        if ($complaint->status === 'rejected') {
-            $complaint->creator->notify(new ComplaintRejected($complaint));
-        } else {
-            $complaint->creator->notify(new ComplaintStatusUpdated($complaint));
+        if ($complaint->creator) {
+            if ($complaint->status === 'rejected') {
+                $complaint->creator->notify(new ComplaintRejected($complaint));
+            } else {
+                $complaint->creator->notify(new ComplaintStatusUpdated($complaint));
+            }
         }
 
         return back()->with('success', 'Status updated.');
@@ -126,5 +128,27 @@ class ComplaintAdminController extends Controller
         $complaint->update($validated);
 
         return redirect()->route('admin.complaints.index')->with('success', 'Complaint updated.');
+    }
+
+    public function bulkAction(Request $request)
+    {
+        $request->validate([
+            'action' => 'required|string',
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:complaints,id',
+        ]);
+
+        $action = $request->input('action');
+        $ids = $request->input('ids');
+
+        if ($action === 'delete') {
+            Complaint::whereIn('id', $ids)->delete();
+            return back()->with('success', count($ids) . ' complaints deleted successfully.');
+        } elseif (in_array($action, ['pending', 'in_progress', 'resolved', 'rejected'])) {
+            Complaint::whereIn('id', $ids)->update(['status' => $action]);
+            return back()->with('success', count($ids) . ' complaints updated to ' . str_replace('_', ' ', $action) . '.');
+        }
+
+        return back()->with('error', 'Invalid action selected.');
     }
 }

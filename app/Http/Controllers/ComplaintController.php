@@ -101,4 +101,60 @@ class ComplaintController extends Controller
             abort(403);
         }
     }
+
+    public function bulkAction(Request $request)
+    {
+        $request->validate([
+            'action' => 'required|string',
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:complaints,id',
+        ]);
+
+        $action = $request->input('action');
+        $ids = $request->input('ids');
+
+        if ($action === 'withdraw') {
+            $complaints = Complaint::whereIn('id', $ids)
+                ->where('created_by', auth()->id())
+                ->get();
+
+            $withdrawnCount = 0;
+            $skippedCount = 0;
+
+            foreach ($complaints as $complaint) {
+                if ($complaint->status !== 'pending') {
+                    $skippedCount++;
+                    continue;
+                }
+
+                $complaint->update(['status' => 'withdrawn']);
+
+                ComplaintLog::create([
+                    'complaint_id' => $complaint->id,
+                    'user_id' => auth()->id(),
+                    'action' => 'withdrawn',
+                    'message' => 'Complaint withdrawn via bulk action',
+                    'meta' => ['from' => 'pending', 'to' => 'withdrawn'],
+                ]);
+
+                $admins = User::where('role', 'admin')->get();
+                Notification::send($admins, new ComplaintWithdrawn($complaint));
+
+                if ($complaint->assignee) {
+                    $complaint->assignee->notify(new ComplaintWithdrawn($complaint));
+                }
+
+                $withdrawnCount++;
+            }
+
+            $message = "$withdrawnCount complaints withdrawn successfully.";
+            if ($skippedCount > 0) {
+                $message .= " $skippedCount complaints skipped (only pending complaints can be withdrawn).";
+            }
+
+            return back()->with($skippedCount > 0 && $withdrawnCount == 0 ? 'error' : 'success', $message);
+        }
+
+        return back()->with('error', 'Invalid action selected.');
+    }
 }

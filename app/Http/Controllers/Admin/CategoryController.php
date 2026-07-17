@@ -189,4 +189,42 @@ class CategoryController extends Controller
 
         return response()->stream($callback, 200, $headers);
     }
+
+    public function bulkAction(Request $request)
+    {
+        $request->validate([
+            'action' => 'required|string',
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:categories,id',
+        ]);
+
+        $action = $request->input('action');
+        $ids = $request->input('ids');
+
+        if ($action === 'delete') {
+            $categories = Category::with('complaints')->whereIn('id', $ids)->get();
+            $deletedCount = 0;
+            $skippedCount = 0;
+
+            foreach ($categories as $category) {
+                $unresolvedCount = $category->complaints()->whereNotIn('status', ['resolved', 'rejected'])->count();
+                if ($unresolvedCount > 0) {
+                    $skippedCount++;
+                    continue;
+                }
+                $category->complaints()->delete();
+                $category->delete();
+                $deletedCount++;
+            }
+
+            $message = "$deletedCount categories deleted successfully.";
+            if ($skippedCount > 0) {
+                $message .= " $skippedCount categories skipped due to unresolved complaints.";
+            }
+
+            return back()->with($skippedCount > 0 && $deletedCount == 0 ? 'error' : 'success', $message);
+        }
+
+        return back()->with('error', 'Invalid action selected.');
+    }
 }

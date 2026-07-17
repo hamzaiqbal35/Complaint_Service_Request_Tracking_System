@@ -97,8 +97,64 @@ class StaffComplaintController extends Controller
             'meta' => ['from' => $from, 'to' => $complaint->status],
         ]);
 
-        $complaint->creator->notify(new ComplaintStatusUpdated($complaint));
+        if ($complaint->creator) {
+            $complaint->creator->notify(new ComplaintStatusUpdated($complaint));
+        }
 
         return back()->with('success', 'Status updated.');
+    }
+
+    public function bulkAction(Request $request)
+    {
+        $request->validate([
+            'action' => 'required|string',
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:complaints,id',
+        ]);
+
+        $action = $request->input('action');
+        $ids = $request->input('ids');
+
+        // Staff can only modify complaints assigned to them
+        $complaints = Complaint::whereIn('id', $ids)
+            ->where('assigned_to', auth()->id())
+            ->get();
+
+        $updatedCount = 0;
+        $skippedCount = 0;
+
+        foreach ($complaints as $complaint) {
+            $from = $complaint->status;
+            
+            // Apply staff state machine rules
+            if ($action === 'in_progress' && $from === 'pending') {
+                $complaint->update(['status' => 'in_progress']);
+            } elseif ($action === 'resolved' && $from === 'in_progress') {
+                $complaint->update(['status' => 'resolved', 'resolved_at' => now()]);
+            } else {
+                $skippedCount++;
+                continue;
+            }
+
+            ComplaintLog::create([
+                'complaint_id' => $complaint->id,
+                'user_id' => auth()->id(),
+                'action' => 'status_changed',
+                'message' => 'Status updated via bulk action',
+                'meta' => ['from' => $from, 'to' => $action],
+            ]);
+
+            if ($complaint->creator) {
+                $complaint->creator->notify(new ComplaintStatusUpdated($complaint));
+            }
+            $updatedCount++;
+        }
+
+        $message = "$updatedCount complaints updated successfully.";
+        if ($skippedCount > 0) {
+            $message .= " $skippedCount complaints skipped due to invalid state transitions.";
+        }
+
+        return back()->with($skippedCount > 0 && $updatedCount == 0 ? 'error' : 'success', $message);
     }
 }

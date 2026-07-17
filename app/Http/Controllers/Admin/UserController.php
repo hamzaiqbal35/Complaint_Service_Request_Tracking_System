@@ -231,4 +231,28 @@ class UserController extends Controller
 
         return back()->with('info', 'User email is already verified.');
     }
+
+    public function bulkAction(Request $request)
+    {
+        $request->validate([
+            'action' => 'required|string',
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:users,id',
+        ]);
+
+        $action = $request->input('action');
+        $ids = $request->input('ids');
+
+        if ($action === 'delete') {
+            // Prevent deleting the currently authenticated user
+            $ids = array_filter($ids, fn($id) => $id != auth()->id());
+            User::whereIn('id', $ids)->delete();
+            return back()->with('success', count($ids) . ' users deleted successfully.');
+        } elseif ($action === 'verify') {
+            User::whereIn('id', $ids)->update(['email_verified_at' => now()]);
+            return back()->with('success', count($ids) . ' users verified successfully.');
+        }
+
+        return back()->with('error', 'Invalid action selected.');
+    }
 }

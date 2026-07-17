@@ -103,10 +103,10 @@
     </div>
 
     <!-- Bento Grid Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-8">
         
         <!-- Primary Stat -->
-        <div class="bg-gradient-to-br from-teal-500 to-emerald-600 rounded-3xl p-6 shadow-[0_15px_40px_-10px_rgba(16,185,129,0.4)] relative overflow-hidden text-white group">
+        <div class="bg-gradient-to-br from-teal-500 to-emerald-600 rounded-3xl p-6 shadow-[0_15px_40px_-10px_rgba(16,185,129,0.4)] relative overflow-hidden text-white group col-span-2 md:col-span-3 lg:col-span-1">
             <div class="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
             <div class="relative z-10">
                 <div class="flex justify-between items-start mb-4">
@@ -155,6 +155,48 @@
             <div class="text-3xl font-black text-slate-800 relative z-10">{{ $stats['resolved'] }}</div>
         </div>
 
+        <!-- Rejected -->
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-md transition-shadow">
+            <div class="absolute right-0 top-0 w-32 h-32 bg-rose-500/5 rounded-full blur-3xl group-hover:bg-rose-500/10 transition-colors duration-500"></div>
+            <div class="flex justify-between items-start mb-4 relative z-10">
+                <div class="w-12 h-12 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500 border border-rose-100">
+                    <i class="fas fa-times-circle text-xl"></i>
+                </div>
+            </div>
+            <h3 class="text-slate-500 font-medium mb-1 relative z-10">Rejected</h3>
+            <div class="text-3xl font-black text-slate-800 relative z-10">{{ $stats['rejected'] ?? 0 }}</div>
+        </div>
+
+        <!-- Withdrawn -->
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-md transition-shadow">
+            <div class="absolute right-0 top-0 w-32 h-32 bg-slate-500/5 rounded-full blur-3xl group-hover:bg-slate-500/10 transition-colors duration-500"></div>
+            <div class="flex justify-between items-start mb-4 relative z-10">
+                <div class="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-500 border border-slate-100">
+                    <i class="fas fa-ban text-xl"></i>
+                </div>
+            </div>
+            <h3 class="text-slate-500 font-medium mb-1 relative z-10">Withdrawn</h3>
+            <div class="text-3xl font-black text-slate-800 relative z-10">{{ $stats['withdrawn'] ?? 0 }}</div>
+        </div>
+
+    </div>
+
+    <!-- Analytics Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Line Chart -->
+        <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-slate-100 p-6 flex flex-col">
+            <h3 class="text-lg font-bold text-slate-800 mb-4">Complaints Trend (Last 30 Days)</h3>
+            <div class="relative w-full flex-1 h-72">
+                <canvas id="trendLineChart"></canvas>
+            </div>
+        </div>
+        <!-- Pie Chart -->
+        <div class="lg:col-span-1 bg-white rounded-3xl shadow-sm border border-slate-100 p-6 flex flex-col">
+            <h3 class="text-lg font-bold text-slate-800 mb-4">Status Distribution</h3>
+            <div class="relative w-full flex-1 h-72 flex items-center justify-center">
+                <canvas id="statusPieChart"></canvas>
+            </div>
+        </div>
     </div>
 
     <!-- Main Content Area -->
@@ -340,6 +382,7 @@
 </div>
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('alpine:init', () => {
     const dateFrom = document.getElementById('date_from');
@@ -362,6 +405,114 @@ document.addEventListener('alpine:init', () => {
             }
         });
     }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const chartData = @json($chartData ?? ['pie' => [], 'line' => ['labels' => [], 'data' => []]]);
+    
+    // Pie Chart
+    const pieCtx = document.getElementById('statusPieChart').getContext('2d');
+    new Chart(pieCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Pending', 'In Progress', 'Resolved', 'Rejected', 'Withdrawn'],
+            datasets: [{
+                data: [
+                    chartData.pie.pending || 0,
+                    chartData.pie.in_progress || 0,
+                    chartData.pie.resolved || 0,
+                    chartData.pie.rejected || 0,
+                    chartData.pie.withdrawn || 0
+                ],
+                backgroundColor: [
+                    '#f59e0b', // amber-500
+                    '#3b82f6', // blue-500
+                    '#10b981', // emerald-500
+                    '#f43f5e', // rose-500
+                    '#64748b'  // slate-500
+                ],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                }
+            },
+            cutout: '70%'
+        }
+    });
+
+    // Line Chart
+    const lineCtx = document.getElementById('trendLineChart').getContext('2d');
+    new Chart(lineCtx, {
+        type: 'line',
+        data: {
+            labels: chartData.line.labels,
+            datasets: [{
+                label: 'New Complaints',
+                data: chartData.line.data,
+                borderColor: '#14b8a6', // teal-500
+                backgroundColor: 'rgba(20, 184, 166, 0.1)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: '#fff',
+                pointBorderColor: '#14b8a6',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    },
+                    grid: {
+                        color: '#f1f5f9', // slate-100
+                        drawBorder: false
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        maxTicksLimit: 7
+                    }
+                }
+            },
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            }
+        }
+    });
 });
 </script>
 @endpush
