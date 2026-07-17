@@ -16,6 +16,11 @@ class ProfileUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Staff members are not allowed to update their name and email
+        if ($this->user()->isStaff()) {
+            return [];
+        }
+
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => [

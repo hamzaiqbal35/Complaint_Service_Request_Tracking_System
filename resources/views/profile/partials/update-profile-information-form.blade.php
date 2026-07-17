@@ -22,7 +22,8 @@
         <div>
             <label for="name" class="block text-sm font-semibold text-slate-700 mb-2">Name</label>
             <input id="name" name="name" type="text" value="{{ old('name', $user->name) }}" required autofocus autocomplete="name"
-                   class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-slate-700 bg-slate-50 focus:bg-white placeholder-slate-400 @error('name') border-rose-500 @enderror">
+                   {{ auth()->user()->isStaff() ? 'readonly disabled' : '' }}
+                   class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-slate-700 {{ auth()->user()->isStaff() ? 'bg-slate-100 cursor-not-allowed' : 'bg-slate-50 focus:bg-white' }} placeholder-slate-400 @error('name') border-rose-500 @enderror">
             @error('name')
                 <p class="mt-2 text-sm text-rose-500"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</p>
             @enderror
@@ -31,7 +32,8 @@
         <div>
             <label for="email" class="block text-sm font-semibold text-slate-700 mb-2">Email</label>
             <input id="email" name="email" type="email" value="{{ old('email', $user->email) }}" required autocomplete="username"
-                   class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-slate-700 bg-slate-50 focus:bg-white placeholder-slate-400 @error('email') border-rose-500 @enderror">
+                   {{ auth()->user()->isStaff() ? 'readonly disabled' : '' }}
+                   class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-slate-700 {{ auth()->user()->isStaff() ? 'bg-slate-100 cursor-not-allowed' : 'bg-slate-50 focus:bg-white' }} placeholder-slate-400 @error('email') border-rose-500 @enderror">
             @error('email')
                 <p class="mt-2 text-sm text-rose-500"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</p>
             @enderror
@@ -54,6 +56,7 @@
             @endif
         </div>
 
+        @if(!auth()->user()->isStaff())
         <div class="flex items-center gap-4 pt-4 border-t border-slate-100">
             <button type="submit" class="px-6 py-3 rounded-xl font-medium text-white bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 transition-all shadow-md shadow-teal-500/20 flex items-center gap-2">
                 <i class="fas fa-save"></i> Save Changes
@@ -65,5 +68,13 @@
                 </p>
             @endif
         </div>
+        @else
+        <div class="pt-4 border-t border-slate-100">
+            <p class="text-sm text-slate-500 flex items-start gap-2">
+                <i class="fas fa-info-circle text-teal-500 mt-0.5"></i>
+                <span>As a staff member, your name and email are managed by the administration and cannot be changed here.</span>
+            </p>
+        </div>
+        @endif
     </form>
 </section>
