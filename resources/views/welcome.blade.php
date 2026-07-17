@@ -55,6 +55,29 @@
         }
 
         /* ============================================
+           SCROLL PROGRESS BAR
+           ============================================ */
+        .scroll-progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            z-index: 10000;
+            pointer-events: none;
+        }
+        .scroll-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--g-teal);
+            box-shadow: 0 0 10px rgba(13, 148, 136, 0.8), 0 0 20px rgba(20, 184, 166, 0.6);
+            transition: width 0.1s ease-out;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+
+        /* ============================================
            CUSTOM CURSOR
            ============================================ */
         body { cursor: none; }
@@ -1431,6 +1454,13 @@
     <div class="cursor-outline" id="cursor-outline"></div>
 
     <!-- ========================================
+         SCROLL PROGRESS BAR
+         ======================================== -->
+    <div class="scroll-progress-container">
+        <div class="scroll-progress-bar" id="scrollProgressBar"></div>
+    </div>
+
+    <!-- ========================================
          NAVBAR
          ======================================== -->
     <nav class="navbar" id="mainNavbar">
@@ -2045,6 +2075,17 @@
     <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
     
     <script>
+        // Scroll Progress Bar Logic
+        const scrollProgressBar = document.getElementById('scrollProgressBar');
+        window.addEventListener('scroll', () => {
+            if (scrollProgressBar) {
+                const scrollTop = window.scrollY || document.documentElement.scrollTop;
+                const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const scrollPercentage = Math.min((scrollTop / scrollHeight) * 100, 100);
+                scrollProgressBar.style.width = scrollPercentage + '%';
+            }
+        }, { passive: true });
+
         // Custom Cursor Logic
         const cursorDot = document.getElementById("cursor-dot");
         const cursorOutline = document.getElementById("cursor-outline");
