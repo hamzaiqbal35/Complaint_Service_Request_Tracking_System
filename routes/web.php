@@ -17,6 +17,9 @@ Route::get('/', function () {
 });
 
 // Landing page remains public
+Route::get('/privacy-policy', function () { return view('pages.privacy-policy'); })->name('privacy.policy');
+Route::get('/terms-of-service', function () { return view('pages.terms-of-service'); })->name('terms.service');
+Route::get('/cookies', function () { return view('pages.cookies'); })->name('cookies');
 
 // All application areas require authenticated AND verified users
 Route::middleware(['auth', 'verified'])->group(function () {

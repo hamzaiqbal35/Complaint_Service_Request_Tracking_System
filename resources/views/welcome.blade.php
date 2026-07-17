@@ -1910,33 +1910,14 @@
                         <li><a href="#faq">FAQ</a></li>
                     </ul>
                 </div>
-
-                <div>
-                    <div class="footer-col-title">Resources</div>
-                    <ul class="footer-links">
-                        <li><a href="#">Documentation</a></li>
-                        <li><a href="#">API Reference</a></li>
-                        <li><a href="#">Release Notes</a></li>
-                        <li><a href="#">Support</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <div class="footer-col-title">Contact</div>
-                    <ul class="footer-links">
-                        <li><a href="mailto:hamzaiqbalrajpoot35@gmail.com"><i class="fas fa-envelope" style="margin-right: 6px; font-size: 0.8rem;"></i> Email Us</a></li>
-                        <li><a href="#"><i class="fas fa-map-marker-alt" style="margin-right: 6px; font-size: 0.8rem;"></i> Location</a></li>
-                        <li><a href="#"><i class="fas fa-phone" style="margin-right: 6px; font-size: 0.8rem;"></i> Contact</a></li>
-                    </ul>
-                </div>
             </div>
 
             <div class="footer-bottom">
                 <div class="footer-copyright">&copy; {{ date('Y') }} Complaint & Service Request Tracking System. All rights reserved.</div>
                 <div class="footer-bottom-links">
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
-                    <a href="#">Cookies</a>
+                    <a href="{{ route('privacy.policy') }}">Privacy Policy</a>
+                    <a href="{{ route('terms.service') }}">Terms of Service</a>
+                    <a href="{{ route('cookies') }}">Cookies</a>
                 </div>
             </div>
         </div>
