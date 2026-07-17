@@ -14,8 +14,8 @@
             <!-- Email Address -->
             <div>
                 <label for="email" class="block text-sm font-medium text-slate-300 mb-2">Email Address</label>
-                <input id="email" type="email" name="email" value="{{ old('email', $request->email) }}" required autofocus autocomplete="username"
-                    class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors">
+                <input id="email" type="email" name="email" value="{{ old('email', $request->email) }}" required readonly autocomplete="username"
+                    class="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-3 text-slate-400 cursor-not-allowed focus:outline-none transition-colors">
                 <x-input-error :messages="$errors->get('email')" class="mt-2 text-rose-400" />
             </div>
 
@@ -23,7 +23,7 @@
             <div>
                 <label for="password" class="block text-sm font-medium text-slate-300 mb-2">New Password</label>
                 <div class="relative">
-                    <input id="password" type="password" name="password" required autocomplete="new-password"
+                    <input id="password" type="password" name="password" required autofocus autocomplete="new-password"
                         class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors pr-12">
                     <button type="button" class="absolute inset-y-0 right-0 px-4 flex items-center text-slate-400 hover:text-white transition-colors" onclick="togglePasswordVisibility('password', this)">
                         <i class="far fa-eye" id="eye-icon-password"></i>
