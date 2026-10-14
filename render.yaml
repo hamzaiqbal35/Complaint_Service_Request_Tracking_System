@@ -18,6 +18,13 @@ services:
         fromDatabase:
           name: csrts-db
           property: connectionString
+      # Initial Admin Seeding (Set in Render Dashboard -> Environment)
+      - key: SEED_ADMIN
+        sync: false # Set to 'true' to seed admin on next deploy, then 'false' afterwards
+      - key: ADMIN_EMAIL
+        sync: false # Default: admin@example.com (or enter your custom admin email)
+      - key: ADMIN_PASSWORD
+        sync: false # Default: password (or enter your custom secure password)
 
 databases:
   - name: csrts-db
